@@ -21,6 +21,7 @@ import { clearDraft, loadDraft, loadPurchase, saveDraft, type Purchase } from "@
 import { DocPreview } from "./DocPreview";
 import { Field } from "./Field";
 import { Icon } from "./Icon";
+import { JourneyRail, type JourneyNode } from "./JourneyRail";
 import { Logo } from "./Logo";
 
 export function Wizard({ slug }: { slug: string }) {
@@ -142,6 +143,26 @@ export function Wizard({ slug }: { slug: string }) {
 
   const primaryLabel = stepIndex === reviewIndex - 1 ? "Review document" : "Continue";
 
+  const summaryFor = (i: number) => {
+    const vals = visibleFields(steps[i], answers)
+      .map((f) => ({ f, v: displayValue(f, answers[f.id] ?? "") }))
+      .filter((x) => x.v);
+    const pick = vals.find((x) => x.f.type !== "choice") ?? vals[0];
+    return pick?.v.split("\n").join(", ");
+  };
+  const stateOf = (i: number): JourneyNode["state"] => (i < stepIndex ? "done" : i === stepIndex ? "current" : "todo");
+  const journey: JourneyNode[] = [
+    ...steps.map((s, i) => ({
+      label: s.label,
+      state: stateOf(i),
+      summary: i < stepIndex ? summaryFor(i) : undefined,
+      onClick: () => goTo(i),
+    })),
+    { label: "Review", state: stateOf(reviewIndex), icon: "eye", onClick: () => goTo(reviewIndex) },
+    { label: `Pay once · ${price}`, state: purchase ? "done" : "todo", icon: "lock" },
+    { label: "Download & sign", state: purchase ? "done" : "todo", icon: "download", summary: "Print-ready PDF, yours to keep" },
+  ];
+
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f5f0] lg:h-screen lg:overflow-hidden">
       {/* Top bar */}
@@ -164,16 +185,18 @@ export function Wizard({ slug }: { slug: string }) {
         </div>
       </header>
 
-      <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[minmax(440px,1fr)_minmax(0,1.15fr)]">
+      <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[minmax(440px,1fr)_minmax(0,1.15fr)] xl:grid-cols-[264px_minmax(440px,1fr)_minmax(0,1.1fr)]">
+        <JourneyRail title={template.shortName} pct={done.pct} nodes={journey} price={price} />
+
         {/* Form */}
         <main className="lg:overflow-y-auto" aria-label="Questions">
           <div ref={formTopRef} className="mx-auto w-full max-w-xl scroll-mt-20 px-5 pt-7 pb-36 sm:px-8 lg:pt-12 lg:pb-16">
             {/* Stepper */}
-            <nav aria-label="Progress" className="mb-9">
+            <nav aria-label="Progress" className="mb-9 xl:mb-8">
               <div className="flex items-baseline justify-between gap-3 text-[13px]">
                 <p className="text-muted">
                   <span className="font-semibold text-ink">
-                    {isReview ? "Final step" : `Step ${stepIndex + 1}`}
+                    {`Step ${stepIndex + 1}`}
                   </span>{" "}
                   of {totalSteps} <span className="mx-1 text-line">/</span>
                   <span className="text-ink-soft">{currentLabel}</span>
@@ -182,7 +205,7 @@ export function Wizard({ slug }: { slug: string }) {
                   <Icon name="clock" className="size-3.5" /> ~{template.minutes} min
                 </p>
               </div>
-              <ol className="mt-3 flex gap-1.5">
+              <ol className="mt-3 flex gap-1.5 xl:hidden">
                 {[...steps.map((s) => s.label), "Review"].map((label, i) => {
                   const state = i < stepIndex ? "done" : i === stepIndex ? "current" : "todo";
                   return (

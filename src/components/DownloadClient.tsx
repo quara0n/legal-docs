@@ -96,10 +96,23 @@ export function DownloadClient({ slug }: { slug: string }) {
             </>
           ) : (
             <>
-              <div className="grid size-12 place-items-center rounded-full bg-brand-soft text-brand">
-                <Icon name="check" strokeWidth={2.4} />
-              </div>
-              <h1 className="mt-5 font-serif text-4xl font-medium tracking-tight sm:text-5xl">Your {template.shortName} is ready</h1>
+              <ol className="flex items-center" aria-label="Your progress">
+                {["Answered", "Reviewed", "Paid", "Ready"].map((label, i, all) => (
+                  <li key={label} className="flex items-center">
+                    <span className="flex flex-col items-center gap-1.5">
+                      <span
+                        className={`animate-pop grid size-9 place-items-center rounded-full ${i === all.length - 1 ? "bg-ink text-mint ring-4 ring-mint/30" : "bg-brand text-white"}`}
+                        style={{ animationDelay: `${i * 120}ms` }}
+                      >
+                        <Icon name="check" className="size-4" strokeWidth={3} />
+                      </span>
+                      <span className="text-[11px] font-semibold text-ink-soft">{label}</span>
+                    </span>
+                    {i < all.length - 1 && <span className="mx-1.5 mb-5 h-0.5 w-8 rounded-full bg-brand sm:w-12" aria-hidden="true" />}
+                  </li>
+                ))}
+              </ol>
+              <h1 className="mt-7 font-serif text-4xl font-medium tracking-tight sm:text-5xl">Your {template.shortName} is ready</h1>
               <p className="mt-3 text-lg text-ink-soft">Thanks for your purchase. It&apos;s yours to keep, with no subscription and nothing to cancel.</p>
               <div className="mt-7 flex flex-wrap gap-3">
                 {state.kind === "ready" ? (

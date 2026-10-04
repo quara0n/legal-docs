@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTemplate, getTemplates } from "@/content";
 import { DocPreview } from "@/components/DocPreview";
+import { JourneyShowcase } from "@/components/JourneyShowcase";
 import { Icon, type IconName } from "@/components/Icon";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -42,12 +43,6 @@ const COMPARE: { label: string; them: string; us: string }[] = [
   { label: "Account required", them: "Yes", us: "No" },
   { label: "Something to cancel", them: "Yes, or you keep getting charged", us: "Nothing, ever" },
   { label: "Keep your document", them: "Access can end when you cancel", us: "The PDF is yours forever" },
-];
-
-const STEPS: { icon: IconName; title: string; text: string }[] = [
-  { icon: "edit", title: "Answer plain-English questions", text: "One simple question at a time. No legal jargon, no 40-field forms." },
-  { icon: "eye", title: "Watch it write itself", text: "Your document updates live beside the questions, so you always know what you're signing." },
-  { icon: "download", title: "Pay once, download", text: "Only if you're happy. Get a clean PDF, ready to print and sign." },
 ];
 
 export default function Home() {
@@ -166,20 +161,13 @@ export default function Home() {
         {/* How it works */}
         <section id="how" className="scroll-mt-20 py-24">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="max-w-xl font-serif text-4xl font-medium tracking-tight">From blank page to signed in three steps</h2>
-            <div className="mt-12 grid gap-8 md:grid-cols-3">
-              {STEPS.map((s, i) => (
-                <div key={s.title} className="relative">
-                  <div className="flex items-center gap-3">
-                    <span className="grid size-11 place-items-center rounded-xl bg-ink text-white">
-                      <Icon name={s.icon} />
-                    </span>
-                    <span className="font-serif text-5xl font-medium text-line">{i + 1}</span>
-                  </div>
-                  <h3 className="mt-5 text-lg font-semibold">{s.title}</h3>
-                  <p className="mt-2 leading-relaxed text-ink-soft">{s.text}</p>
-                </div>
-              ))}
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-sm font-semibold text-brand">How it works</p>
+              <h2 className="mt-2 font-serif text-4xl font-medium tracking-tight text-balance sm:text-5xl">From blank page to signed in four steps</h2>
+              <p className="mt-4 text-ink-soft">You always see where you are, what&apos;s next, and what it costs.</p>
+            </div>
+            <div className="mt-14">
+              <JourneyShowcase minPrice={formatPrice(Math.min(...prices))} />
             </div>
           </div>
         </section>
