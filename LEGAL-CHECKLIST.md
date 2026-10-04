@@ -51,13 +51,21 @@ disclaimers and attorney-reviewed templates.
   for gross negligence or under consumer protection law. That is why the company and insurance
   steps below matter.
 
-## 3. Run it through a company, not personally
+## 3. Your business form: ENK now, AS later
 
-- ☐ **Set up an AS (aksjeselskap)** and sell through it. A sole proprietorship (ENK) leaves your
-  personal savings and home exposed if someone sues. An AS needs NOK 30,000 in share capital and
-  is registered at Brønnøysundregistrene (Altinn).
-- ☐ Open a business bank account, and put the Stripe account, domain and Google Ads account in
-  the company's name.
+You run this through your **ENK (enkeltpersonforetak)**. That's fine for launching, but an ENK
+has **no liability shield**: if a customer sued and won, your personal savings and home would be
+at stake. The disclaimers, the checkbox, the liability cap and insurance (section 4) are what
+protect you while you're on the ENK, so don't skip the insurance.
+
+- ☐ Use the ENK's registered name, address and organization number for the company details on the
+  site (`NEXT_PUBLIC_COMPANY_NAME`, `NEXT_PUBLIC_COMPANY_ADDRESS`).
+- ☐ Put the Stripe account, domain and Google Ads account in the ENK's name. Use a separate bank
+  account for the business, even though an ENK doesn't legally require one.
+- ☐ **Convert to an AS (aksjeselskap)** once the revenue justifies it, and before you scale up ad
+  spend. An AS limits your risk to what's in the company. It needs NOK 30,000 in share capital and
+  is registered at Brønnøysundregistrene (Altinn). An accountant can help you move the business
+  from the ENK into the AS.
 - Alternative: a US LLC is common for US-facing businesses. Owned by a Norwegian tax resident it
   brings extra tax filings in both countries, so ask an accountant before choosing it.
 
@@ -157,9 +165,9 @@ customers. Norway's regulator is Datatilsynet.
 
 ### The short version
 
-1. Set up an AS and put everything in its name.
-2. Fill in the company details and support email.
-3. Get E&O/liability insurance that covers US claims.
+1. Launch on your ENK, and fill in its name, address, org number and a support email on the site.
+2. Get E&O/liability insurance that covers US claims. On an ENK this is your main protection.
+3. Convert to an AS before you scale up ad spend.
 4. Never give legal advice in support emails or ads, and never claim "lawyer-approved".
 5. Accept your providers' DPAs and keep a one-page data record.
 6. Add a cookie consent banner before you add the Google Ads tag.
