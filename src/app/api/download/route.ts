@@ -14,7 +14,10 @@ export async function POST(request: Request) {
   const answers: Answers = {};
   for (const [k, v] of Object.entries(body.answers ?? {}).slice(0, 200)) if (typeof v === "string") answers[k.slice(0, 64)] = v.slice(0, 5000);
 
-  const bytes = await renderPdf(template.render(withDefaults(template, answers)), { title: template.name });
+  const bytes = await renderPdf(template.render(withDefaults(template, answers)), {
+    title: template.name,
+    note: "This document was prepared from a self-help template. It is not legal advice and was not reviewed by an attorney. Laws vary by state; you are responsible for making sure it fits your situation.",
+  });
   return new Response(Buffer.from(bytes), {
     headers: {
       "Content-Type": "application/pdf",

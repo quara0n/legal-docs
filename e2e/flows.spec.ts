@@ -39,7 +39,10 @@ test("fill in an NDA, pay in demo mode and download the PDF", async ({ page, isM
   await expect(page.getByRole("heading", { name: "Review and download" })).toBeVisible();
 
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: /Pay \$9 and download/ }).click();
+  const pay = page.getByRole("button", { name: /Pay \$9 and download/ });
+  await expect(pay).toBeDisabled();
+  await page.getByRole("checkbox", { name: /not a law firm/ }).check();
+  await pay.click();
   const file = await download;
   expect(file.suggestedFilename()).toBe("non-disclosure-agreement.pdf");
   await expect(page.getByRole("heading", { name: /Your NDA is ready/ })).toBeVisible();

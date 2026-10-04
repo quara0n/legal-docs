@@ -226,4 +226,13 @@ export const billOfSale: Template = {
     if (c.is("notary", "yes")) blocks.push({ type: "notary", state: c.v("state", "state") });
     return blocks;
   },
+  warnings(a) {
+    if (a.itemKind !== "vehicle") return [];
+    return [
+      {
+        level: "info" as const,
+        text: `Selling a vehicle${a.state ? ` in ${a.state}` : ""}? You'll usually also need to sign over the title, and some states require their own DMV bill of sale form or a notarized signature. Check your state DMV's website before you sign.`,
+      },
+    ];
+  },
 };

@@ -34,6 +34,9 @@ export async function POST(request: Request) {
     success_url: `${done}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/create/${template.slug}?step=review`,
     allow_promotion_codes: true,
+    custom_text: {
+      submit: { message: "Self-help legal template. Not a law firm, not legal advice. One-time payment, no subscription." },
+    },
   });
   return Response.json({ url: session.url });
 }

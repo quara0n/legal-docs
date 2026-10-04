@@ -12,9 +12,11 @@ Rough order; the first five get you live.
    Turn on email receipts, and verify the domain for Apple Pay.
 4. **Company details and support email.** Set `NEXT_PUBLIC_COMPANY_NAME`,
    `NEXT_PUBLIC_COMPANY_ADDRESS` and `NEXT_PUBLIC_SUPPORT_EMAIL` (and make sure the inbox works).
-5. **Lawyer review.** Send `LEGAL-REVIEW.md` (scope, open questions, reviewer options) to a US attorney to review the 8 templates and the terms, privacy, refund
-   and disclaimer pages. Many offer a fixed fee for this. Change wording in `src/content/en-US/`
-   and `src/app/{terms,privacy,refunds,disclaimer}/`.
+5. **Legal risk (no lawyer review).** The templates had an AI pre-review only, not an attorney's.
+   The site limits the risk: buyers must tick "not a law firm, not legal advice" before paying,
+   every PDF ends with a not-legal-advice note, the terms cap liability at the price paid, and the
+   editor warns or blocks where a state needs something different. If you ever get complaints
+   about one document, pull it or get just that one reviewed.
 6. **Refund promise.** The site offers a 14-day no-questions refund. Keep it (it converts well)
    or change `refundDays` in `src/lib/site.ts`.
 7. **Analytics (optional).** Create a Plausible site and set `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`.

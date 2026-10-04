@@ -66,9 +66,15 @@ export default function TermsPage() {
 
       <h2>9. Limitation of liability</h2>
       <p>
-        To the extent permitted by law, we are not liable for indirect, incidental or consequential damages, and our total
-        liability for any claim relating to a document is limited to the amount you paid for that document. Some places
-        don&apos;t allow these limits, so they may not apply to you.
+        To the fullest extent permitted by law: (a) we are not liable for any indirect, incidental, special, consequential
+        or punitive damages, or for lost profits, lost deposits, unpaid rent or loans, legal fees, or any loss arising from
+        how a document is used, interpreted or enforced; and (b) <strong>our total liability for all claims relating to a
+        document is limited to the amount you paid for that document</strong>. Some places don&apos;t allow these limits,
+        so parts of them may not apply to you.
+      </p>
+      <p>
+        You agree that you chose the document and every answer in it yourself, that we did not advise you, and that you
+        will not hold us responsible for the legal effect of a document you created.
       </p>
 
       <h2>10. Changes and governing law</h2>

@@ -20,7 +20,7 @@ interface Piece {
   bold: boolean;
 }
 
-export async function renderPdf(blocks: Block[], meta: { title: string; author?: string }) {
+export async function renderPdf(blocks: Block[], meta: { title: string; author?: string; note?: string }) {
   const doc = await PDFDocument.create();
   doc.setTitle(meta.title);
   doc.setCreator(meta.author ?? "");
@@ -263,6 +263,15 @@ export async function renderPdf(blocks: Block[], meta: { title: string; author?:
         y -= 12;
         break;
     }
+  }
+
+  // Closing note on the last page. Unbranded, so the document stays the customer's.
+  if (meta.note) {
+    y -= 18;
+    ensure(40);
+    page.drawLine({ start: { x: MARGIN_X, y }, end: { x: MARGIN_X + 120, y }, thickness: 0.5, color: MUTED });
+    y -= 4;
+    paragraph([{ text: sanitize(meta.note), bold: false }], { size: 8, color: MUTED, after: 0 });
   }
 
   const pages = doc.getPages();

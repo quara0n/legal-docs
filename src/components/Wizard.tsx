@@ -467,6 +467,7 @@ function Review(props: {
 }) {
   const { answers, steps, missing, warnings, onEdit, price, paying, payError, purchase, slug, onPay } = props;
   const blocked = warnings.some((w) => w.level === "block");
+  const [agreed, setAgreed] = useState(false);
   const ready = missing.length === 0 && !blocked;
   return (
     <div className="animate-rise">
@@ -528,9 +529,25 @@ function Review(props: {
                 </li>
               ))}
             </ul>
+            <label className="mt-5 flex cursor-pointer gap-3 rounded-xl border border-line bg-paper p-3.5 text-[13px] leading-relaxed text-ink-soft">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-[var(--color-brand)]"
+              />
+              <span>
+                I understand {SITE.name} is not a law firm, this is a self-help template and not legal advice, and I&apos;m
+                responsible for checking it fits my situation and state. I agree to the{" "}
+                <Link href="/terms" target="_blank" className="font-medium text-brand underline">
+                  terms
+                </Link>
+                .
+              </span>
+            </label>
             <button
               type="button"
-              disabled={!ready || paying}
+              disabled={!ready || !agreed || paying}
               onClick={onPay}
               className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-3.5 font-semibold text-white shadow-sm transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
