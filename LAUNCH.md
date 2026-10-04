@@ -4,9 +4,9 @@ The app is built, tested and ready to deploy. It launches in **Norway first**: N
 site, seven Norwegian templates, prices in NOK (99–199 kr). These are the steps only the owner
 can do. Rough order; the first five get you live.
 
-1. **Buy the domain.** The name is **Rettfram** (already set in the code). Check that rettfram.no is
+1. **Buy the domain.** The name is **Rettfram** (already set in the code). Check that rettframavtaler.no is
    free and search the name at search.patentstyret.no, buy the domain with your ENK's org number,
-   then set `NEXT_PUBLIC_SITE_URL` (e.g. `https://rettfram.no`).
+   then set `NEXT_PUBLIC_SITE_URL` (e.g. `https://rettframavtaler.no`).
 2. **Deploy on Vercel.** vercel.com/new → import `quara0n/legal-docs` → add the variables from
    `.env.example` → Deploy. Add the domain under Settings → Domains. `NEXT_PUBLIC_MARKET` can stay
    unset (Norway is the default).
@@ -17,7 +17,7 @@ can do. Rough order; the first five get you live.
    access at docs.stripe.com/payments/vipps (or ask Stripe support), turn Vipps on under
    Settings → Payment methods once approved, then set `NEXT_PUBLIC_VIPPS=1` and redeploy.
 4. **Company details and support email.** Already set in `src/lib/site.ts` (Rune Finne, org.nr.
-   915 553 346, support hei@rettfram.no). Create the hei@rettfram.no inbox when you buy the domain.
+   915 553 346, support hei@rettframavtaler.no). Create the hei@rettframavtaler.no inbox when you buy the domain.
 5. **Legal risk (no lawyer review).** The templates had an AI pre-review only, not an attorney's.
    The site limits the risk: buyers must tick "not a law firm, not legal advice" before paying,
    every PDF ends with a not-legal-advice note, the terms cap liability at the price paid, and the

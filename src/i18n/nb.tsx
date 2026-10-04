@@ -5,11 +5,11 @@ import type { Dict } from "./en";
 // All interface text for the Norwegian site.
 export const nb: Dict = {
   meta: {
-    title: `${SITE.name}: Juridiske dokumenter til én ærlig pris`,
+    title: `${SITE.name}: Avtaler, rett fram. Juridiske dokumenter til én ærlig pris`,
     description:
       "Lag husleiekontrakt, kjøpekontrakt, gjeldsbrev, fullmakt og andre avtaler på få minutter. Se hele dokumentet gratis, betal én gang per dokument. Ingen abonnement.",
     ogAlt: "Juridiske dokumenter til én ærlig pris",
-    ogEyebrow: "Ingen abonnement. Ingen konto.",
+    ogEyebrow: "Avtaler, rett fram.",
     ogTitle: "Juridiske dokumenter til én ærlig pris.",
     ogFooter: "Se gratis · Betal én gang · Behold for alltid",
     docOgAlt: "Dokumentmal",

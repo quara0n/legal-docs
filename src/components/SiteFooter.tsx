@@ -26,6 +26,7 @@ export function SiteFooter() {
         </div>
         <div>
           <h3 className="text-sm font-semibold">{SITE.name}</h3>
+          {SITE.slogan && <p className="mt-1 text-sm text-muted">{SITE.slogan}</p>}
           <ul className="mt-3 space-y-2 text-sm text-ink-soft">
             <li><Link href="/#pricing" className="hover:text-ink">{t.footer.pricing}</Link></li>
             <li><Link href="/terms" className="hover:text-ink">{t.footer.terms}</Link></li>

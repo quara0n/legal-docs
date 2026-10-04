@@ -4,7 +4,7 @@ A guided document builder for simple legal documents. Visitors answer one short 
 at a time, watch the document write itself in a live preview, and pay once per document only
 when they download the PDF. No subscription, no account.
 
-The brand is **Rettfram** (rettfram.no). `NEXT_PUBLIC_SITE_NAME` overrides it, for example for a US deployment.
+The brand is **Rettfram** (rettframavtaler.no). `NEXT_PUBLIC_SITE_NAME` overrides it, for example for a US deployment.
 
 ## Markets
 
