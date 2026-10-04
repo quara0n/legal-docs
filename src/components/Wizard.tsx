@@ -16,6 +16,7 @@ import {
   type Answers,
   type Field as FieldDef,
 } from "@/lib/doc";
+import { track } from "@/lib/analytics";
 import { SITE } from "@/lib/site";
 import { clearDraft, loadDraft, loadPurchase, saveDraft, type Purchase } from "@/lib/storage";
 import { DocPreview } from "./DocPreview";
@@ -63,6 +64,7 @@ export function Wizard({ slug }: { slug: string }) {
     }
     setPurchase(loadPurchase(slug));
     setHydrated(true);
+    if (!draft) track("Document started", { document: slug });
   }, [slug, template]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -107,6 +109,7 @@ export function Wizard({ slug }: { slug: string }) {
       document.getElementById(`f-${Object.keys(errs)[0]}`)?.focus();
       return;
     }
+    track("Step completed", { document: slug, step: step.label });
     goTo(stepIndex + 1);
   };
 
@@ -115,6 +118,7 @@ export function Wizard({ slug }: { slug: string }) {
   const pay = async () => {
     setPaying(true);
     setPayError("");
+    track("Checkout started", { document: slug });
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -160,7 +164,7 @@ export function Wizard({ slug }: { slug: string }) {
     })),
     { label: "Review", state: stateOf(reviewIndex), icon: "eye", onClick: () => goTo(reviewIndex) },
     { label: `Pay once · ${price}`, state: purchase ? "done" : "todo", icon: "lock" },
-    { label: "Download & sign", state: purchase ? "done" : "todo", icon: "download", summary: "Print-ready PDF, yours to keep" },
+    { label: "Download & sign", state: purchase ? "done" : "todo", icon: "download", summary: "Print-ready PDF" },
   ];
 
   return (

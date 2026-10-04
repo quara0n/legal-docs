@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   if (!check.ok) return Response.json({ error: check.reason }, { status: 402 });
 
   const answers: Answers = {};
-  for (const [k, v] of Object.entries(body.answers ?? {})) if (typeof v === "string") answers[k] = v.slice(0, 5000);
+  for (const [k, v] of Object.entries(body.answers ?? {}).slice(0, 200)) if (typeof v === "string") answers[k.slice(0, 64)] = v.slice(0, 5000);
 
   const bytes = await renderPdf(template.render(withDefaults(template, answers)), { title: template.name });
   return new Response(Buffer.from(bytes), {

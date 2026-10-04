@@ -1,11 +1,12 @@
 # Fairform: legal documents at one honest price
 
 A guided document builder for simple legal documents (NDA, residential lease, bill of sale,
-freelance service agreement, general power of attorney). Visitors answer one short question
+freelance service agreement, general power of attorney, promissory note, sublease and
+roommate agreement). Visitors answer one short question
 at a time, watch the document write itself in a live preview, and pay once per document only
 when they download the PDF. No subscription, no account.
 
-"Fairform" is a placeholder name: change it in `src/lib/site.ts`.
+"Fairform" is a placeholder name: set `NEXT_PUBLIC_SITE_NAME` to change it.
 
 ## Run it
 
@@ -18,11 +19,43 @@ npm run dev                  # http://localhost:3000
 Without `STRIPE_SECRET_KEY` the app runs in **demo mode**: the pay button skips checkout and
 goes straight to the download page, so every flow can be tried locally.
 
+## Deploy to Vercel
+
+1. Go to vercel.com/new, import the `legal-docs` GitHub repository, and keep the default
+   Next.js settings.
+2. Add the environment variables from `.env.example` (at least `NEXT_PUBLIC_SITE_URL`,
+   `NEXT_PUBLIC_SUPPORT_EMAIL`, `NEXT_PUBLIC_COMPANY_NAME`, `NEXT_PUBLIC_COMPANY_ADDRESS` and
+   `STRIPE_SECRET_KEY`).
+3. Deploy, then add your domain under Project → Settings → Domains and update
+   `NEXT_PUBLIC_SITE_URL` to match.
+
+Every push to `main` redeploys automatically.
+
+## Tests
+
+```bash
+npm run lint && npm run typecheck   # static checks
+npm test                            # unit tests: every template, PDF output, payment checks
+npm run build && npm run test:e2e   # browser tests (desktop + mobile) against the production build
+```
+
+The template tests answer every question with every option and fail if any blank is left
+in the document, if a template refers to a field that doesn't exist, or if the PDF breaks.
+CI runs all of this on every push (`.github/workflows/ci.yml`).
+
+## Analytics
+
+Set `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` to turn on cookie-free Plausible analytics. The app sends
+these events (never any document answers): Document started, Step completed, Checkout
+started, Purchase completed, PDF downloaded. Add them as goals in Plausible to get a funnel.
+
 ## Turning on payments
 
 1. Create a Stripe account and copy the test secret key into `.env.local` as `STRIPE_SECRET_KEY`.
 2. Pay with card `4242 4242 4242 4242`, any future date, any CVC.
 3. For production, use the live key and set `NEXT_PUBLIC_SITE_URL`.
+4. In the Stripe dashboard, turn on email receipts (Settings → Customer emails) and, for
+   Apple Pay, verify your domain (Settings → Payment methods → Apple Pay).
 
 Checkout is a one-time Stripe Checkout session built from the template's price (no Stripe
 products to set up). The download API re-checks the session with Stripe (paid, right
@@ -62,6 +95,4 @@ separate domain when the second locale is ready.
 
 ## Before launch
 
-- Have a licensed attorney review the template wording.
-- Replace the placeholder terms/privacy page (`src/app/legal`) and support email (`src/lib/site.ts`).
-- Decide whether to keep the 14-day refund promise shown on the site.
+See `LAUNCH.md`.

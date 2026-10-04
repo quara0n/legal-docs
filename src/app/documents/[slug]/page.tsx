@@ -43,6 +43,13 @@ export default async function TemplatePage(props: PageProps<"/documents/[slug]">
         offers: { "@type": "Offer", price: (t.price / 100).toFixed(2), priceCurrency: "USD", availability: "https://schema.org/InStock", url: `${SITE.url}/documents/${t.slug}` },
       },
       {
+        "@type": "HowTo",
+        name: `How to make a ${t.name}`,
+        totalTime: `PT${t.minutes}M`,
+        estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: (t.price / 100).toFixed(2) },
+        step: [...t.steps.map((s) => s.label), "Review", "Download and sign"].map((name, i) => ({ "@type": "HowToStep", position: i + 1, name })),
+      },
+      {
         "@type": "FAQPage",
         mainEntity: t.seo.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
       },
@@ -119,6 +126,26 @@ export default async function TemplatePage(props: PageProps<"/documents/[slug]">
               </ul>
             </div>
           </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 pt-20 sm:px-6">
+          <h2 className="font-serif text-3xl font-medium tracking-tight">How to make your {t.shortName}</h2>
+          <p className="mt-2 text-ink-soft">
+            {t.steps.length + 2} short steps, about {t.minutes} minutes. You can go back and change anything until you download.
+          </p>
+          <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ...t.steps.map((s) => ({ title: s.label, text: typeof s.description === "string" ? s.description : `Answer a few quick questions about the ${s.label.toLowerCase()}.` })),
+              { title: "Review", text: "Read the whole document, with every answer highlighted. Change anything with one click." },
+              { title: "Download and sign", text: `Pay ${price} once and get a print-ready PDF. Everyone signs and keeps a copy.` },
+            ].map((s, i) => (
+              <li key={s.title} className="relative rounded-2xl border border-line bg-white p-5">
+                <span className="grid size-8 place-items-center rounded-full bg-ink text-sm font-semibold text-white">{i + 1}</span>
+                <h3 className="mt-3 font-semibold">{s.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-ink-soft">{s.text}</p>
+              </li>
+            ))}
+          </ol>
         </section>
 
         <section className="mx-auto max-w-3xl px-4 py-20 sm:px-6">

@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getTemplate } from "@/content";
 import { withDefaults, type Answers } from "@/lib/doc";
+import { track } from "@/lib/analytics";
 import { SITE } from "@/lib/site";
-import { loadDraft, savePurchase } from "@/lib/storage";
+import { loadDraft, loadPurchase, savePurchase } from "@/lib/storage";
 import { DocPreview } from "./DocPreview";
 import { Icon } from "./Icon";
 
@@ -33,6 +34,7 @@ export function DownloadClient({ slug }: { slug: string }) {
       }
       const url = URL.createObjectURL(await res.blob());
       setState({ kind: "ready", url });
+      track("PDF downloaded", { document: slug });
       if (autoSave) triggerDownload(url, slug);
     } catch (e) {
       setState({ kind: "error", message: e instanceof Error ? e.message : "Something went wrong." });
@@ -48,6 +50,7 @@ export function DownloadClient({ slug }: { slug: string }) {
       setState({ kind: "error", message: "This link is missing its purchase reference." });
       return;
     }
+    if (!loadPurchase(slug)) track("Purchase completed", { document: slug });
     savePurchase(slug, sessionId);
     const draft = loadDraft(slug);
     if (!draft) {
