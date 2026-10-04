@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTemplate, getTemplates } from "@/content";
 import { Wizard } from "@/components/Wizard";
+import { t as tr } from "@/i18n";
 
 export function generateStaticParams() {
   return getTemplates().map((t) => ({ slug: t.slug }));
@@ -10,7 +11,7 @@ export function generateStaticParams() {
 export async function generateMetadata(props: PageProps<"/create/[slug]">): Promise<Metadata> {
   const { slug } = await props.params;
   const t = getTemplate(slug);
-  return { title: t ? `Create your ${t.name}` : "Create", robots: { index: false } };
+  return { title: t ? tr.meta.createTitle(t.name) : tr.nav.create, robots: { index: false } };
 }
 
 export default async function CreatePage(props: PageProps<"/create/[slug]">) {

@@ -4,12 +4,13 @@ import { Suspense } from "react";
 import { getTemplate, getTemplates } from "@/content";
 import { DownloadClient } from "@/components/DownloadClient";
 import { SiteHeader } from "@/components/SiteHeader";
+import { t } from "@/i18n";
 
 export function generateStaticParams() {
   return getTemplates().map((t) => ({ slug: t.slug }));
 }
 
-export const metadata: Metadata = { title: "Your document is ready", robots: { index: false } };
+export const metadata: Metadata = { title: t.meta.readyTitle, robots: { index: false } };
 
 export default async function DownloadPage(props: PageProps<"/create/[slug]/download">) {
   const { slug } = await props.params;

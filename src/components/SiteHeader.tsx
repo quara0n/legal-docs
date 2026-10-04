@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { t } from "@/i18n";
 import { Logo } from "./Logo";
 
 export function SiteHeader() {
@@ -8,19 +9,19 @@ export function SiteHeader() {
         <Logo />
         <nav className="flex items-center gap-1 text-sm">
           <Link href="/documents" className="rounded-lg px-3 py-2 text-ink-soft hover:bg-cream hover:text-ink">
-            Documents
+            {t.nav.documents}
           </Link>
           <Link href="/#pricing" className="hidden rounded-lg px-3 py-2 text-ink-soft hover:bg-cream hover:text-ink sm:block">
-            Pricing
+            {t.nav.pricing}
           </Link>
           <Link href="/#faq" className="hidden rounded-lg px-3 py-2 text-ink-soft hover:bg-cream hover:text-ink sm:block">
-            FAQ
+            {t.nav.faq}
           </Link>
           <Link
             href="/documents"
             className="ml-2 rounded-full bg-ink px-4 py-2 font-medium text-white shadow-sm transition hover:bg-black"
           >
-            Create a document
+            {t.nav.create}
           </Link>
         </nav>
       </div>

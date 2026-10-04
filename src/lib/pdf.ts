@@ -1,14 +1,12 @@
 import { PDFDocument, PDFPage, StandardFonts, rgb } from "pdf-lib";
-import { parseInline, type Block, type SigParty } from "./doc";
+import { isSignatureLine, parseInline, type Block, type SigParty } from "./doc";
 
-// Renders template blocks to a clean, print-ready US Letter PDF.
+// Renders template blocks to a clean, print-ready PDF (US Letter or A4).
 
-const PAGE_W = 612;
-const PAGE_H = 792;
+const SIZES = { letter: [612, 792], a4: [595.28, 841.89] } as const;
 const MARGIN_X = 72;
 const MARGIN_TOP = 72;
 const MARGIN_BOTTOM = 72;
-const CONTENT_W = PAGE_W - MARGIN_X * 2;
 const BODY = 11;
 const LEADING = 15.5;
 const INK = rgb(0.08, 0.09, 0.12);
@@ -20,7 +18,19 @@ interface Piece {
   bold: boolean;
 }
 
-export async function renderPdf(blocks: Block[], meta: { title: string; author?: string; note?: string }) {
+export async function renderPdf(
+  blocks: Block[],
+  meta: {
+    title: string;
+    author?: string;
+    note?: string;
+    pageLabel?: (i: number, n: number) => string;
+    initials?: string;
+    size?: keyof typeof SIZES;
+  },
+) {
+  const [PAGE_W, PAGE_H] = SIZES[meta.size ?? "letter"];
+  const CONTENT_W = PAGE_W - MARGIN_X * 2;
   const doc = await PDFDocument.create();
   doc.setTitle(meta.title);
   doc.setCreator(meta.author ?? "");
@@ -31,7 +41,7 @@ export async function renderPdf(blocks: Block[], meta: { title: string; author?:
 
   const sanitize = (s: string) =>
     s
-      .replace(/ /g, " ")
+      .replace(/[  ]/g, " ")
       .replace(/[‐‑]/g, "-")
       .split("")
       .filter((ch) => ch === "\n" || charset.has(ch.codePointAt(0)!))
@@ -148,7 +158,7 @@ export async function renderPdf(blocks: Block[], meta: { title: string; author?:
     cy -= 6;
     for (const l of p.lines) {
       const blank = l.value === undefined;
-      const lineGap = blank && l.label === "Signature" ? 34 : 24;
+      const lineGap = blank && isSignatureLine(l.label) ? 34 : 24;
       cy -= lineGap;
       const label = sanitize(l.label + ":");
       page.drawText(label, { x, y: cy, size: 10, font: regular, color: MUTED });
@@ -166,7 +176,7 @@ export async function renderPdf(blocks: Block[], meta: { title: string; author?:
   };
 
   const partyHeight = (p: SigParty) =>
-    20 + p.lines.reduce((s, l) => s + (l.value === undefined && l.label === "Signature" ? 34 : 24), 0) + 12;
+    20 + p.lines.reduce((s, l) => s + (l.value === undefined && isSignatureLine(l.label) ? 34 : 24), 0) + 12;
 
   let clauseNo = 0;
   for (const b of blocks) {
@@ -276,12 +286,13 @@ export async function renderPdf(blocks: Block[], meta: { title: string; author?:
 
   const pages = doc.getPages();
   pages.forEach((p, i) => {
-    const label = `Page ${i + 1} of ${pages.length}`;
+    const label = meta.pageLabel ? meta.pageLabel(i + 1, pages.length) : `Page ${i + 1} of ${pages.length}`;
     const w = regular.widthOfTextAtSize(label, 8.5);
     p.drawText(label, { x: (PAGE_W - w) / 2, y: 40, size: 8.5, font: regular, color: MUTED });
     const t = sanitize(meta.title);
     p.drawText(t, { x: MARGIN_X, y: 40, size: 8.5, font: regular, color: MUTED });
-    p.drawText("Initials: ______", { x: PAGE_W - MARGIN_X - regular.widthOfTextAtSize("Initials: ______", 8.5), y: 40, size: 8.5, font: regular, color: MUTED });
+    const initials = meta.initials ?? "Initials: ______";
+    p.drawText(initials, { x: PAGE_W - MARGIN_X - regular.widthOfTextAtSize(initials, 8.5), y: 40, size: 8.5, font: regular, color: MUTED });
   });
 
   return doc.save();

@@ -17,8 +17,9 @@ import {
   type Field as FieldDef,
   type Warning,
 } from "@/lib/doc";
+import { t } from "@/i18n";
 import { track } from "@/lib/analytics";
-import { SITE } from "@/lib/site";
+import { LANG } from "@/lib/market";
 import { clearDraft, loadDraft, loadPurchase, saveDraft, type Purchase } from "@/lib/storage";
 import { DocPreview } from "./DocPreview";
 import { Field } from "./Field";
@@ -105,7 +106,7 @@ export function Wizard({ slug }: { slug: string }) {
   const next = () => {
     if (!step) return;
     const errs: Record<string, string> = {};
-    for (const f of visibleFields(step, answers)) if (f.required && !(answers[f.id] ?? "").trim()) errs[f.id] = "This one is needed for your document.";
+    for (const f of visibleFields(step, answers)) if (f.required && !(answers[f.id] ?? "").trim()) errs[f.id] = t.wizard.required;
     if (Object.keys(errs).length) {
       setErrors(errs);
       document.getElementById(`f-${Object.keys(errs)[0]}`)?.focus();
@@ -118,7 +119,8 @@ export function Wizard({ slug }: { slug: string }) {
   const missing = missingRequired(template, answers);
   const warnings = template.warnings?.(answers) ?? [];
   const stepFieldIds = new Set(step ? visibleFields(step, answers).map((f) => f.id) : []);
-  const showStepWarnings = stepFieldIds.has("state") || stepFieldIds.has("deposit") || stepFieldIds.has("rate") || stepFieldIds.has("effective") || stepFieldIds.has("builtBefore1978");
+  const legacyStepWarnings = ["state", "deposit", "rate", "effective", "builtBefore1978"].some((id) => stepFieldIds.has(id));
+  const stepWarnings = warnings.filter((w) => (w.fields ? w.fields.some((id) => stepFieldIds.has(id)) : legacyStepWarnings));
 
   const pay = async () => {
     setPaying(true);
@@ -131,26 +133,26 @@ export function Wizard({ slug }: { slug: string }) {
         body: JSON.stringify({ slug }),
       });
       const data = await res.json();
-      if (!res.ok || !data.url) throw new Error(data.error ?? "Checkout is unavailable right now.");
+      if (!res.ok || !data.url) throw new Error(data.error ?? t.wizard.checkoutUnavailable);
       window.location.href = data.url;
     } catch (e) {
-      setPayError(e instanceof Error ? e.message : "Something went wrong.");
+      setPayError(e instanceof Error ? e.message : t.wizard.wrong);
       setPaying(false);
     }
   };
 
   const startOver = () => {
-    if (!window.confirm("Clear all answers and start over?")) return;
+    if (!window.confirm(t.wizard.confirmReset)) return;
     clearDraft(slug);
     setAnswers(withDefaults(template, {}));
     goTo(0);
   };
 
-  const price = formatPrice(template.price);
-  const stepTitle = step ? resolve(step.title, answers) : "Review and download";
-  const currentLabel = step ? step.label : "Review";
+  const price = formatPrice(template.price, LANG);
+  const stepTitle = step ? resolve(step.title, answers) : t.wizard.reviewTitle;
+  const currentLabel = step ? step.label : t.wizard.review;
 
-  const primaryLabel = stepIndex === reviewIndex - 1 ? "Review document" : "Continue";
+  const primaryLabel = stepIndex === reviewIndex - 1 ? t.wizard.reviewDoc : t.wizard.continue;
 
   const summaryFor = (i: number) => {
     const vals = visibleFields(steps[i], answers)
@@ -167,9 +169,9 @@ export function Wizard({ slug }: { slug: string }) {
       summary: i < stepIndex ? summaryFor(i) : undefined,
       onClick: () => goTo(i),
     })),
-    { label: "Review", state: stateOf(reviewIndex), icon: "eye", onClick: () => goTo(reviewIndex) },
-    { label: `Pay once · ${price}`, state: purchase ? "done" : "todo", icon: "lock" },
-    { label: "Download & sign", state: purchase ? "done" : "todo", icon: "download", summary: "Print-ready PDF" },
+    { label: t.wizard.review, state: stateOf(reviewIndex), icon: "eye", onClick: () => goTo(reviewIndex) },
+    { label: t.wizard.payOnce(price), state: purchase ? "done" : "todo", icon: "lock" },
+    { label: t.wizard.downloadSign, state: purchase ? "done" : "todo", icon: "download", summary: t.wizard.pdfReady },
   ];
 
   return (
@@ -181,13 +183,13 @@ export function Wizard({ slug }: { slug: string }) {
           <span className="hidden h-5 w-px bg-line sm:block" />
           <span className="hidden truncate text-sm font-medium text-ink-soft sm:block">{template.name}</span>
           <span className="hidden items-center gap-1.5 rounded-full border border-line bg-white px-2.5 py-1 text-[11.5px] text-muted md:inline-flex">
-            <span className="size-1.5 rounded-full bg-brand" /> Autosaved in this browser
+            <span className="size-1.5 rounded-full bg-brand" /> {t.wizard.autosaved}
           </span>
           <div className="ml-auto flex items-center gap-2">
             <span className="hidden items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-brand-dark sm:inline-flex">
-              <span className="font-semibold">{price}</span> one-time · pay only to download
+              <span className="font-semibold">{price}</span> {t.wizard.oneTimeBadge}
             </span>
-            <Link href={`/documents/${slug}`} className="rounded-lg p-2 text-muted transition hover:bg-cream hover:text-ink" aria-label="Close editor">
+            <Link href={`/documents/${slug}`} className="rounded-lg p-2 text-muted transition hover:bg-cream hover:text-ink" aria-label={t.wizard.close}>
               <Icon name="x" />
             </Link>
           </div>
@@ -198,16 +200,16 @@ export function Wizard({ slug }: { slug: string }) {
         <JourneyRail title={template.shortName} pct={done.pct} nodes={journey} price={price} />
 
         {/* Form */}
-        <main className="lg:overflow-y-auto" aria-label="Questions">
+        <main className="lg:overflow-y-auto" aria-label={t.wizard.questions}>
           <div ref={formTopRef} className="mx-auto w-full max-w-xl scroll-mt-20 px-5 pt-7 pb-36 sm:px-8 lg:pt-12 lg:pb-16">
             {/* Stepper */}
-            <nav aria-label="Progress" className="mb-9 xl:mb-8">
+            <nav aria-label={t.wizard.progress} className="mb-9 xl:mb-8">
               <div className="flex items-baseline justify-between gap-3 text-[13px]">
                 <p className="text-muted">
                   <span className="font-semibold text-ink">
-                    {`Step ${stepIndex + 1}`}
+                    {t.wizard.step(stepIndex + 1)}
                   </span>{" "}
-                  of {totalSteps} <span className="mx-1 text-line">/</span>
+                  {t.wizard.of(totalSteps)} <span className="mx-1 text-line">/</span>
                   <span className="text-ink-soft">{currentLabel}</span>
                 </p>
                 <p className="flex shrink-0 items-center gap-1 text-muted">
@@ -215,7 +217,7 @@ export function Wizard({ slug }: { slug: string }) {
                 </p>
               </div>
               <ol className="mt-3 flex gap-1.5 xl:hidden">
-                {[...steps.map((s) => s.label), "Review"].map((label, i) => {
+                {[...steps.map((s) => s.label), t.wizard.review].map((label, i) => {
                   const state = i < stepIndex ? "done" : i === stepIndex ? "current" : "todo";
                   return (
                     <li key={label + i} className="flex-1">
@@ -223,7 +225,7 @@ export function Wizard({ slug }: { slug: string }) {
                         type="button"
                         onClick={() => goTo(i)}
                         aria-current={state === "current" ? "step" : undefined}
-                        aria-label={`Step ${i + 1}: ${label}${state === "done" ? " (done)" : ""}`}
+                        aria-label={t.wizard.stepAria(i + 1, label, state === "done")}
                         title={label}
                         className="group block w-full py-1.5"
                       >
@@ -277,9 +279,9 @@ export function Wizard({ slug }: { slug: string }) {
                     />
                   ))}
                 </form>
-                {showStepWarnings && warnings.length > 0 && (
+                {stepWarnings.length > 0 && (
                   <div className="mt-6">
-                    <Warnings items={warnings} />
+                    <Warnings items={stepWarnings} />
                   </div>
                 )}
                 <div className="mt-10 hidden items-center gap-3 lg:flex">
@@ -289,11 +291,11 @@ export function Wizard({ slug }: { slug: string }) {
                       onClick={() => goTo(stepIndex - 1)}
                       className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 text-sm font-medium text-ink-soft transition hover:bg-white hover:text-ink"
                     >
-                      <Icon name="arrowLeft" className="size-4" /> Back
+                      <Icon name="arrowLeft" className="size-4" /> {t.wizard.back}
                     </button>
                   )}
                   <span className="ml-auto hidden text-xs text-muted xl:inline">
-                    or press <kbd className="rounded-md border border-line bg-white px-1.5 py-0.5 font-sans shadow-[0_1px_0_#e6e2d9]">Enter ↵</kbd>
+                    {t.wizard.orPress} <kbd className="rounded-md border border-line bg-white px-1.5 py-0.5 font-sans shadow-[0_1px_0_#e6e2d9]">Enter ↵</kbd>
                   </span>
                   <button
                     type="button"
@@ -326,10 +328,10 @@ export function Wizard({ slug }: { slug: string }) {
             {hydrated && (
               <div className="mt-14 flex items-center justify-between gap-4 border-t border-line pt-5 text-[12.5px] text-muted">
                 <span className="inline-flex items-center gap-1.5">
-                  <Icon name="lock" className="size-3.5" /> Your answers stay on this device until you download.
+                  <Icon name="lock" className="size-3.5" /> {t.wizard.staysOnDevice}
                 </span>
                 <button type="button" onClick={startOver} className="inline-flex shrink-0 items-center gap-1 transition hover:text-ink">
-                  <Icon name="refresh" className="size-3.5" /> Start over
+                  <Icon name="refresh" className="size-3.5" /> {t.wizard.startOver}
                 </button>
               </div>
             )}
@@ -337,7 +339,7 @@ export function Wizard({ slug }: { slug: string }) {
         </main>
 
         {/* Live preview (desktop) */}
-        <aside className="hidden border-l border-line bg-[#e9e5dc] lg:block lg:min-h-0" aria-label="Document preview">
+        <aside className="hidden border-l border-line bg-[#e9e5dc] lg:block lg:min-h-0" aria-label={t.wizard.preview}>
           <div ref={previewRef} className="relative h-full overflow-y-auto">
             <div className="sticky top-0 z-20 border-b border-[#ddd8cc] bg-[#e9e5dc]/90 px-8 py-3 backdrop-blur xl:px-14">
               <div className="mx-auto flex max-w-[680px] items-center gap-4 text-xs text-ink-soft">
@@ -346,15 +348,13 @@ export function Wizard({ slug }: { slug: string }) {
                     <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-50" />
                     <span className="relative inline-flex size-2 rounded-full bg-brand" />
                   </span>
-                  Live preview
+                  {t.wizard.livePreview}
                 </span>
                 <span className="ml-auto inline-flex items-center gap-2">
                   <span className="h-1.5 w-24 overflow-hidden rounded-full bg-[#d6d0c2]">
                     <span className="block h-full rounded-full bg-brand transition-all duration-500" style={{ width: `${done.pct}%` }} />
                   </span>
-                  <span className="tabular-nums">
-                    {done.filled} of {done.total} details filled
-                  </span>
+                  <span className="tabular-nums">{t.wizard.filled(done.filled, done.total)}</span>
                 </span>
               </div>
             </div>
@@ -366,7 +366,7 @@ export function Wizard({ slug }: { slug: string }) {
                 </div>
               </div>
               <p className="mx-auto mt-6 max-w-[680px] text-center text-xs text-muted">
-                The watermark is only on the preview. Your PDF is clean, with page numbers and signature lines.
+                {t.wizard.watermarkNote}
               </p>
             </div>
           </div>
@@ -382,11 +382,11 @@ export function Wizard({ slug }: { slug: string }) {
               onClick={() => setMobilePreview(true)}
               className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-ink"
             >
-              <Icon name="eye" className="size-4" /> Preview
+              <Icon name="eye" className="size-4" /> {t.wizard.previewBtn}
               <span className="rounded-full bg-brand-soft px-1.5 py-0.5 text-[11px] font-semibold text-brand-dark tabular-nums">{done.pct}%</span>
             </button>
             {stepIndex > 0 && (
-              <button type="button" onClick={() => goTo(stepIndex - 1)} className="grid size-12 shrink-0 place-items-center rounded-full text-ink-soft hover:bg-white" aria-label="Back">
+              <button type="button" onClick={() => goTo(stepIndex - 1)} className="grid size-12 shrink-0 place-items-center rounded-full text-ink-soft hover:bg-white" aria-label={t.wizard.back}>
                 <Icon name="arrowLeft" className="size-5" />
               </button>
             )}
@@ -401,17 +401,15 @@ export function Wizard({ slug }: { slug: string }) {
 
       {/* Mobile preview sheet */}
       {mobilePreview && (
-        <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Document preview">
-          <button type="button" className="animate-fade absolute inset-0 bg-ink/40" aria-label="Close preview" onClick={() => setMobilePreview(false)} />
+        <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label={t.wizard.preview}>
+          <button type="button" className="animate-fade absolute inset-0 bg-ink/40" aria-label={t.wizard.closePreview} onClick={() => setMobilePreview(false)} />
           <div className="animate-sheet absolute inset-x-0 top-6 bottom-0 flex flex-col overflow-hidden rounded-t-3xl bg-[#e9e5dc] shadow-2xl">
             <div className="flex shrink-0 items-center justify-between border-b border-[#ddd8cc] bg-paper px-5 py-3">
               <div>
                 <p className="text-sm font-semibold">{template.name}</p>
-                <p className="text-xs text-muted tabular-nums">
-                  {done.filled} of {done.total} details filled
-                </p>
+                <p className="text-xs text-muted tabular-nums">{t.wizard.filled(done.filled, done.total)}</p>
               </div>
-              <button type="button" onClick={() => setMobilePreview(false)} className="rounded-full bg-cream p-2" aria-label="Close preview">
+              <button type="button" onClick={() => setMobilePreview(false)} className="rounded-full bg-cream p-2" aria-label={t.wizard.closePreview}>
                 <Icon name="x" className="size-4" />
               </button>
             </div>
@@ -422,7 +420,7 @@ export function Wizard({ slug }: { slug: string }) {
             </div>
             <div className="border-t border-line bg-paper p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
               <button type="button" onClick={() => setMobilePreview(false)} className="w-full rounded-full bg-ink py-3 text-sm font-semibold text-white">
-                Back to questions
+                {t.wizard.backToQuestions}
               </button>
             </div>
           </div>
@@ -440,12 +438,12 @@ function displayValue(f: FieldDef, v: string) {
       return f.options?.find((o) => o.value === v)?.label ?? v;
     case "multi": {
       const n = v.split(",").filter(Boolean).length;
-      return `${n} selected`;
+      return t.wizard.selected(n);
     }
     case "money":
-      return formatMoney(v);
+      return formatMoney(v, LANG);
     case "date":
-      return formatDate(v);
+      return formatDate(v, LANG);
     default:
       return v;
   }
@@ -471,8 +469,8 @@ function Review(props: {
   const ready = missing.length === 0 && !blocked;
   return (
     <div className="animate-rise">
-      <h1 className="font-serif text-[30px] leading-tight font-medium tracking-tight sm:text-[34px]">Review and download</h1>
-      <p className="mt-2 text-[15px] text-ink-soft">Check your answers against the preview. You can still change anything.</p>
+      <h1 className="font-serif text-[30px] leading-tight font-medium tracking-tight sm:text-[34px]">{t.wizard.reviewTitle}</h1>
+      <p className="mt-2 text-[15px] text-ink-soft">{t.wizard.reviewLead}</p>
 
       {warnings.length > 0 && (
         <div className="mt-6">
@@ -482,7 +480,7 @@ function Review(props: {
 
       {missing.length > 0 && (
         <div className="mt-6 rounded-xl border border-[#f3d9a4] bg-honey-soft p-4 text-sm">
-          <p className="font-medium">A few answers are still missing:</p>
+          <p className="font-medium">{t.wizard.missing}</p>
           <ul className="mt-2 space-y-1">
             {missing.map((m) => (
               <li key={m.stepId + m.label}>
@@ -498,34 +496,29 @@ function Review(props: {
       <div className="mt-6 rounded-2xl border border-ink/10 bg-white p-6 shadow-[0_10px_30px_-15px_rgba(20,23,31,0.25)]">
         {purchase ? (
           <>
-            <p className="text-sm font-medium text-brand">You already own this document</p>
-            <p className="mt-1 text-sm text-ink-soft">Edits and re-downloads are free for {SITE.editDays} days after purchase.</p>
+            <p className="text-sm font-medium text-brand">{t.wizard.owned}</p>
+            <p className="mt-1 text-sm text-ink-soft">{t.wizard.ownedText}</p>
             <Link
               href={`/create/${slug}/download?session_id=${encodeURIComponent(purchase.sessionId)}`}
               className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-3.5 font-semibold text-white transition hover:bg-brand-dark"
             >
-              <Icon name="download" className="size-4" /> Download updated PDF
+              <Icon name="download" className="size-4" /> {t.wizard.downloadUpdated}
             </Link>
           </>
         ) : (
           <>
             <div className="flex items-baseline justify-between">
-              <p className="font-medium">Your document</p>
+              <p className="font-medium">{t.wizard.yourDoc}</p>
               <p>
                 <span className="font-serif text-3xl font-medium">{price}</span>
-                <span className="ml-1 text-sm text-muted">one-time</span>
+                <span className="ml-1 text-sm text-muted">{t.doc.oneTime}</span>
               </p>
             </div>
             <ul className="mt-4 space-y-2 text-sm text-ink-soft">
-              {[
-                "Print-ready PDF, no watermark, no branding",
-                `Free edits and re-downloads for ${SITE.editDays} days`,
-                "No subscription, nothing renews, no account needed",
-                `Not happy? Full refund within ${SITE.refundDays} days, just email us`,
-              ].map((t) => (
-                <li key={t} className="flex gap-2">
+              {t.wizard.perks.map((x) => (
+                <li key={x} className="flex gap-2">
                   <Icon name="check" className="mt-0.5 size-4 shrink-0 text-brand" strokeWidth={2.4} />
-                  {t}
+                  {x}
                 </li>
               ))}
             </ul>
@@ -536,14 +529,7 @@ function Review(props: {
                 onChange={(e) => setAgreed(e.target.checked)}
                 className="mt-0.5 size-4 shrink-0 accent-[var(--color-brand)]"
               />
-              <span>
-                I understand {SITE.name} is not a law firm, this is a self-help template and not legal advice, and I&apos;m
-                responsible for checking it fits my situation and state. I agree to the{" "}
-                <Link href="/terms" target="_blank" className="font-medium text-brand underline">
-                  terms
-                </Link>
-                .
-              </span>
+              <span>{t.wizard.agree}</span>
             </label>
             <button
               type="button"
@@ -552,19 +538,19 @@ function Review(props: {
               className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-3.5 font-semibold text-white shadow-sm transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
               {paying ? (
-                "Opening secure checkout…"
+                t.wizard.opening
               ) : (
                 <>
-                  <Icon name="lock" className="size-4" /> Pay {price} and download
+                  <Icon name="lock" className="size-4" /> {t.wizard.pay(price)}
                 </>
               )}
             </button>
             {payError && <p className="mt-3 text-center text-sm text-[#b42318]">{payError}</p>}
-            <p className="mt-3 text-center text-xs text-muted">Secure payment by Stripe. Card, Apple Pay and Google Pay.</p>
+            <p className="mt-3 text-center text-xs text-muted">{t.wizard.secure}</p>
           </>
         )}
       </div>
-      <h2 className="mt-10 text-sm font-semibold">Your answers</h2>
+      <h2 className="mt-10 text-sm font-semibold">{t.wizard.yourAnswers}</h2>
       <div className="mt-3 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
         {steps.map((s, i) => {
           const rows = visibleFields(s, answers)
@@ -583,12 +569,12 @@ function Review(props: {
                       </div>
                     ))
                   ) : (
-                    <dd className="text-muted italic">Not answered yet</dd>
+                    <dd className="text-muted italic">{t.wizard.notAnswered}</dd>
                   )}
                 </dl>
               </div>
               <button type="button" onClick={() => onEdit(i)} className="inline-flex shrink-0 items-center gap-1 self-start rounded-lg px-2 py-1 text-sm font-medium text-brand hover:bg-brand-soft">
-                <Icon name="edit" className="size-3.5" /> Edit
+                <Icon name="edit" className="size-3.5" /> {t.wizard.edit}
               </button>
             </div>
           );
@@ -596,8 +582,7 @@ function Review(props: {
       </div>
 
       <p className="mt-5 text-xs leading-relaxed text-muted">
-        {SITE.name} provides self-help templates, not legal advice, and is not a substitute for the advice of an attorney. Laws differ by state.
-        For complex situations, have an attorney review your document.
+        {t.wizard.disclaimer}
       </p>
     </div>
   );

@@ -1,10 +1,12 @@
 import { getLocale, getTemplate } from "@/content";
+import { t } from "@/i18n";
+import { LANG } from "@/lib/market";
 import { demoMode, stripe } from "@/lib/payments";
 
 export async function POST(request: Request) {
   const { slug } = (await request.json().catch(() => ({}))) as { slug?: string };
   const template = slug ? getTemplate(slug) : undefined;
-  if (!template) return Response.json({ error: "Unknown document." }, { status: 400 });
+  if (!template) return Response.json({ error: t.api.unknownDoc }, { status: 400 });
 
   const origin = request.headers.get("origin") ?? new URL(request.url).origin;
   const done = `${origin}/create/${template.slug}/download`;
@@ -25,7 +27,7 @@ export async function POST(request: Request) {
           unit_amount: template.price,
           product_data: {
             name: template.name,
-            description: "One-time purchase. PDF download, free edits for 30 days. No subscription.",
+            description: t.api.productDescription,
           },
         },
       },
@@ -34,8 +36,9 @@ export async function POST(request: Request) {
     success_url: `${done}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/create/${template.slug}?step=review`,
     allow_promotion_codes: true,
+    locale: LANG === "nb-NO" ? "nb" : "en",
     custom_text: {
-      submit: { message: "Self-help legal template. Not a law firm, not legal advice. One-time payment, no subscription." },
+      submit: { message: t.api.checkoutNote },
     },
   });
   return Response.json({ url: session.url });

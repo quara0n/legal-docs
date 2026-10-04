@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTemplates } from "@/content";
+import { t } from "@/i18n";
 import { SITE } from "@/lib/site";
 import { Logo } from "./Logo";
 
@@ -9,18 +10,15 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="max-w-sm">
           <Logo />
-          <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-            Simple legal documents at one honest price. Pay once per document, keep it forever. No subscription, no
-            account, no surprises.
-          </p>
+          <p className="mt-3 text-sm leading-relaxed text-ink-soft">{t.footer.blurb}</p>
         </div>
         <div>
-          <h3 className="text-sm font-semibold">Documents</h3>
+          <h3 className="text-sm font-semibold">{t.footer.documents}</h3>
           <ul className="mt-3 space-y-2 text-sm text-ink-soft">
-            {getTemplates().map((t) => (
-              <li key={t.slug}>
-                <Link href={`/documents/${t.slug}`} className="hover:text-ink">
-                  {t.name}
+            {getTemplates().map((d) => (
+              <li key={d.slug}>
+                <Link href={`/documents/${d.slug}`} className="hover:text-ink">
+                  {d.name}
                 </Link>
               </li>
             ))}
@@ -29,19 +27,26 @@ export function SiteFooter() {
         <div>
           <h3 className="text-sm font-semibold">{SITE.name}</h3>
           <ul className="mt-3 space-y-2 text-sm text-ink-soft">
-            <li><Link href="/#pricing" className="hover:text-ink">Pricing</Link></li>
-            <li><Link href="/terms" className="hover:text-ink">Terms of service</Link></li>
-            <li><Link href="/privacy" className="hover:text-ink">Privacy policy</Link></li>
-            <li><Link href="/refunds" className="hover:text-ink">Refund policy</Link></li>
-            <li><Link href="/disclaimer" className="hover:text-ink">Not legal advice</Link></li>
-            <li><a href={`mailto:${SITE.supportEmail}`} className="hover:text-ink">Contact</a></li>
+            <li><Link href="/#pricing" className="hover:text-ink">{t.footer.pricing}</Link></li>
+            <li><Link href="/terms" className="hover:text-ink">{t.footer.terms}</Link></li>
+            <li><Link href="/privacy" className="hover:text-ink">{t.footer.privacy}</Link></li>
+            <li><Link href="/refunds" className="hover:text-ink">{t.footer.refunds}</Link></li>
+            <li><Link href="/disclaimer" className="hover:text-ink">{t.footer.disclaimer}</Link></li>
+            <li><a href={`mailto:${SITE.supportEmail}`} className="hover:text-ink">{t.footer.contact}</a></li>
           </ul>
         </div>
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-6xl px-4 py-5 text-xs leading-relaxed text-muted sm:px-6">
-          {SITE.name} is not a law firm and does not provide legal advice. Our templates are general documents that
-          you complete yourself, and they are not a substitute for the advice of an attorney. For advice about your situation, talk to a licensed attorney in your state.
+          {t.footer.legal}
+          {SITE.company && !SITE.company.startsWith("[") && (
+            <>
+              {" "}
+              {SITE.company}
+              {SITE.companyId && `, org.nr. ${SITE.companyId}`}
+              {SITE.companyAddress && !SITE.companyAddress.startsWith("[") && `, ${SITE.companyAddress}`}.
+            </>
+          )}
         </p>
       </div>
     </footer>

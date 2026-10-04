@@ -49,7 +49,8 @@ function variants(t: Template, base: Answers): Answers[] {
   return out;
 }
 
-const templates = getTemplates();
+// Every locale, including the ones this market does not publish.
+const templates = Object.values(LOCALES).flatMap((l) => l.templates);
 
 describe("template registry", () => {
   it("has unique slugs", () => {
@@ -104,7 +105,7 @@ describe.each(templates.map((t) => [t.slug, t] as const))("%s", (_slug, t) => {
 });
 
 describe("state warnings", () => {
-  const poa = getTemplates().find((t) => t.slug === "general-power-of-attorney")!;
+  const poa = getTemplates("en-US").find((t) => t.slug === "general-power-of-attorney")!;
 
   it("blocks the power of attorney in New York, which requires its own statutory form", () => {
     expect(poa.warnings!({ state: "New York" }).some((w) => w.level === "block")).toBe(true);
@@ -117,8 +118,39 @@ describe("state warnings", () => {
   });
 
   it("adds the lead-paint disclosure for older rentals", () => {
-    const lease = getTemplates().find((t) => t.slug === "residential-lease-agreement")!;
+    const lease = getTemplates("en-US").find((t) => t.slug === "residential-lease-agreement")!;
     expect(JSON.stringify(lease.render(withDefaults(lease, { builtBefore1978: "yes" })))).toContain("Lead-Based Paint Disclosure");
     expect(JSON.stringify(lease.render(withDefaults(lease, { builtBefore1978: "no" })))).not.toContain("Lead-Based Paint Disclosure");
+  });
+});
+
+describe("Norwegian rules", () => {
+  const nb = (slug: string) => getTemplates("nb-NO").find((t) => t.slug === slug)!;
+  const blocks = (t: Template, a: Answers) => (t.warnings?.(withDefaults(t, a)) ?? []).some((w) => w.level === "block");
+
+  it("is the market this build sells to by default", () => {
+    expect(getTemplates().map((t) => t.locale)).toEqual(getTemplates("nb-NO").map(() => "nb-NO"));
+  });
+
+  it("caps the deposit at six months' rent (husleieloven § 3-5)", () => {
+    expect(blocks(nb("husleiekontrakt"), { rent: "10000", security: "depositum", deposit: "60000" })).toBe(false);
+    expect(blocks(nb("husleiekontrakt"), { rent: "10000", security: "depositum", deposit: "60001" })).toBe(true);
+    expect(blocks(nb("fremleiekontrakt"), { rent: "5000", deposit: "40 000" })).toBe(true);
+  });
+
+  it("refuses to act as a fremtidsfullmakt", () => {
+    expect(blocks(nb("fullmakt"), { purpose: "future" })).toBe(true);
+    expect(blocks(nb("fullmakt"), { purpose: "specific" })).toBe(false);
+  });
+
+  it("refuses business-to-consumer sales, where forbrukerkjøpsloven applies", () => {
+    expect(blocks(nb("kjopekontrakt"), { sellerPrivate: "no", buyerConsumer: "yes" })).toBe(true);
+    expect(blocks(nb("kjopekontrakt"), { sellerPrivate: "yes" })).toBe(false);
+  });
+
+  it("formats Norwegian money and dates in the document", () => {
+    const text = JSON.stringify(nb("husleiekontrakt").render(withDefaults(nb("husleiekontrakt"), { rent: "12000", start: "2026-11-01" })));
+    expect(text).toContain("kr 12 000,-");
+    expect(text).toContain("1. november 2026");
   });
 });

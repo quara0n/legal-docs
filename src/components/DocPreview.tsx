@@ -1,4 +1,5 @@
-import { parseInline, type Block, type SigParty } from "@/lib/doc";
+import { isSignatureLine, parseInline, type Block, type SigParty } from "@/lib/doc";
+import { HTML_LANG } from "@/lib/market";
 
 function Inline({ text, active }: { text: string; active?: string | null }) {
   return (
@@ -23,7 +24,7 @@ function Party({ p, active }: { p: SigParty; active?: string | null }) {
       <div className="text-[0.72em] font-bold tracking-wider">{p.heading}</div>
       <div className="mt-2 space-y-3">
         {p.lines.map((l, i) => (
-          <div key={i} className={`flex items-end gap-2 text-[0.85em] ${l.value === undefined && l.label === "Signature" ? "pt-5" : ""}`}>
+          <div key={i} className={`flex items-end gap-2 text-[0.85em] ${l.value === undefined && isSignatureLine(l.label) ? "pt-5" : ""}`}>
             <span className="shrink-0 text-[#6b7280]">{l.label}:</span>
             <span className="min-h-[1.4em] flex-1 truncate border-b border-[#9ca3af] pb-0.5">
               {l.value !== undefined && <Inline text={l.value} active={active} />}
@@ -39,7 +40,7 @@ export function DocPreview({ blocks, active, watermark = true, small = false }: 
   let n = 0;
   return (
     <div className="relative">
-      {watermark && <div className="watermark absolute inset-0 z-10" />}
+      {watermark && <div className="watermark absolute inset-0 z-10" data-lang={HTML_LANG} />}
       <article className={`sheet relative select-none ${small ? "text-[11px]" : "text-[13.5px] sm:text-[14.5px]"}`}>
         {blocks.map((b, i) => {
           switch (b.type) {

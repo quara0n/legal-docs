@@ -1,12 +1,25 @@
 # Fairform: legal documents at one honest price
 
-A guided document builder for simple legal documents (NDA, residential lease, bill of sale,
-freelance service agreement, general power of attorney, promissory note, sublease and
-roommate agreement). Visitors answer one short question
+A guided document builder for simple legal documents. Visitors answer one short question
 at a time, watch the document write itself in a live preview, and pay once per document only
 when they download the PDF. No subscription, no account.
 
 "Fairform" is a placeholder name: set `NEXT_PUBLIC_SITE_NAME` to change it.
+
+## Markets
+
+One deployment sells to one market, chosen with `NEXT_PUBLIC_MARKET` at build time:
+
+- `no` (default): Norwegian site, prices in NOK, A4 PDFs, Norwegian terms with angrerett.
+  Templates in `src/content/nb-NO/`: husleiekontrakt, fremleiekontrakt, kjøpekontrakt,
+  gjeldsbrev, fullmakt, oppdragsavtale and taushetserklæring.
+- `us`: English site, prices in USD, US Letter PDFs. Templates in `src/content/en-US/`: NDA,
+  residential lease, bill of sale, service agreement, power of attorney, promissory note,
+  sublease and roommate agreement.
+
+Interface text lives in `src/i18n/` (`en.tsx`, `nb.tsx`); the legal pages have a version per
+market (`src/app/terms/no.tsx` and `us.tsx`, and so on). The other market's templates stay in the
+code and in the tests, but are not published.
 
 ## Run it
 

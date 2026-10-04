@@ -1,5 +1,7 @@
 // Core types shared by templates, the live preview and the PDF renderer.
 
+import type { Lang } from "./market";
+
 export type Answers = Record<string, string>;
 
 export type FieldType =
@@ -46,6 +48,9 @@ export interface SigLine {
   label: string;
   value?: string; // undefined renders a blank line to sign or fill by hand
 }
+
+// The line that gets extra room for a handwritten signature.
+export const isSignatureLine = (label: string) => label === "Signature" || label === "Underskrift";
 
 export interface SigParty {
   heading: string;
@@ -96,6 +101,9 @@ export interface Template {
 export interface Warning {
   level: "info" | "block";
   text: string;
+  // Show the warning while the visitor is on a step with one of these fields
+  // (it always shows on the review step).
+  fields?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -145,7 +153,7 @@ export function plainText(text: string, blank = "__________") {
 // ---------------------------------------------------------------------------
 // Helpers templates use to turn answers into text
 
-export function makeCtx(a: Answers) {
+export function makeCtx(a: Answers, lang: Lang = "en-US") {
   const raw = (id: string) => (a[id] ?? "").trim();
   const has = (id: string) => raw(id).length > 0;
   const tok = (id: string, value: string, label: string) =>
@@ -153,9 +161,9 @@ export function makeCtx(a: Answers) {
 
   const v = (id: string, label: string) => tok(id, raw(id), label);
 
-  const date = (id: string, label: string) => tok(id, formatDate(raw(id)), label);
+  const date = (id: string, label: string) => tok(id, formatDate(raw(id), lang), label);
 
-  const money = (id: string, label: string) => tok(id, formatMoney(raw(id)), label);
+  const money = (id: string, label: string) => tok(id, formatMoney(raw(id), lang), label);
 
   // Multi-line answers ("one name per line") joined into prose.
   const names = (id: string, label: string) => {
@@ -175,31 +183,52 @@ export function makeCtx(a: Answers) {
       .map((s) => s.trim())
       .filter(Boolean);
 
-  return { raw, has, v, date, money, names, opt, multi, is: (id: string, val: string) => raw(id) === val };
+  return { raw, has, v, date, money, names, opt, multi, num: (id: string) => parseAmount(raw(id), lang), is: (id: string, val: string) => raw(id) === val };
 }
 
 export type Ctx = ReturnType<typeof makeCtx>;
 
-export function joinList(list: string[]) {
+export function joinList(list: string[], and = "and") {
   if (list.length <= 1) return list.join("");
-  if (list.length === 2) return `${list[0]} and ${list[1]}`;
-  return `${list.slice(0, -1).join(", ")}, and ${list[list.length - 1]}`;
+  if (list.length === 2) return `${list[0]} ${and} ${list[1]}`;
+  // Norwegian lists have no comma before "og".
+  const comma = and === "og" ? "" : ",";
+  return `${list.slice(0, -1).join(", ")}${comma} ${and} ${list[list.length - 1]}`;
 }
 
-export function formatDate(iso: string) {
+export function formatDate(iso: string, lang: Lang = "en-US") {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
   const d = new Date(iso + "T00:00:00Z");
-  return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
+  return d.toLocaleDateString(lang, { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
 }
 
-export function formatMoney(value: string) {
-  const n = Number(String(value).replace(/[^0-9.]/g, ""));
+// Reads an amount typed by a person. Norwegians write "5 000" or "1 250,50"
+// (and sometimes "5.000"); Americans write "5,000" or "1,250.50".
+export function parseAmount(value: string, lang: Lang = "en-US") {
+  let s = String(value ?? "").trim();
+  if (!s) return NaN;
+  if (lang === "nb-NO") {
+    s = s.replace(/,-$/, "").replace(/[^0-9.,]/g, "");
+    if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+    else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+  } else s = s.replace(/[^0-9.]/g, "");
+  return s ? Number(s) : NaN;
+}
+
+// Plain spaces, so the PDF fonts can print the result.
+const group = (n: number, decimals: number, lang: Lang) =>
+  n.toLocaleString(lang, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).replace(/[\u00a0\u202f]/g, " ");
+
+export function formatMoney(value: string, lang: Lang = "en-US") {
+  const n = parseAmount(value, lang);
   if (!value || Number.isNaN(n)) return "";
-  return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (lang === "nb-NO") return `kr ${group(n, Number.isInteger(n) ? 0 : 2, lang)}${Number.isInteger(n) ? ",-" : ""}`;
+  return "$" + group(n, 2, lang);
 }
 
-export function formatPrice(cents: number) {
+export function formatPrice(cents: number, lang: Lang = "en-US") {
   const whole = cents % 100 === 0;
+  if (lang === "nb-NO") return `${group(cents / 100, whole ? 0 : 2, lang)} kr`;
   return "$" + (cents / 100).toFixed(whole ? 0 : 2);
 }
 

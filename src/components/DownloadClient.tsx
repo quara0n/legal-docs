@@ -5,8 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getTemplate } from "@/content";
 import { withDefaults, type Answers } from "@/lib/doc";
+import { t } from "@/i18n";
 import { track } from "@/lib/analytics";
-import { SITE } from "@/lib/site";
 import { loadDraft, loadPurchase, savePurchase } from "@/lib/storage";
 import { DocPreview } from "./DocPreview";
 import { Icon } from "./Icon";
@@ -30,14 +30,14 @@ export function DownloadClient({ slug }: { slug: string }) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "We couldn't create your PDF.");
+        throw new Error(data.error ?? t.download.couldNot);
       }
       const url = URL.createObjectURL(await res.blob());
       setState({ kind: "ready", url });
       track("PDF downloaded", { document: slug });
       if (autoSave) triggerDownload(url, slug);
     } catch (e) {
-      setState({ kind: "error", message: e instanceof Error ? e.message : "Something went wrong." });
+      setState({ kind: "error", message: e instanceof Error ? e.message : t.download.wrong });
     }
   }, [slug, sessionId]);
 
@@ -47,7 +47,7 @@ export function DownloadClient({ slug }: { slug: string }) {
     if (started.current) return;
     started.current = true;
     if (!sessionId) {
-      setState({ kind: "error", message: "This link is missing its purchase reference." });
+      setState({ kind: "error", message: t.download.missingRef });
       return;
     }
     if (!loadPurchase(slug)) track("Purchase completed", { document: slug });
@@ -72,14 +72,12 @@ export function DownloadClient({ slug }: { slug: string }) {
               <div className="grid size-12 place-items-center rounded-full bg-[#fde8e7] text-[#b42318]">
                 <Icon name="x" />
               </div>
-              <h1 className="mt-5 font-serif text-4xl font-medium tracking-tight">We hit a snag</h1>
+              <h1 className="mt-5 font-serif text-4xl font-medium tracking-tight">{t.download.snag}</h1>
               <p className="mt-3 text-ink-soft">{state.message}</p>
-              <p className="mt-3 text-sm text-ink-soft">
-                If you were charged, email <a className="font-medium text-brand underline" href={`mailto:${SITE.supportEmail}`}>{SITE.supportEmail}</a> and we will sort it out the same day.
-              </p>
+              <p className="mt-3 text-sm text-ink-soft">{t.download.charged}</p>
               {answers && (
                 <button onClick={() => generate(answers, true)} className="mt-6 rounded-full bg-ink px-6 py-3 font-semibold text-white">
-                  Try again
+                  {t.download.tryAgain}
                 </button>
               )}
             </>
@@ -88,19 +86,16 @@ export function DownloadClient({ slug }: { slug: string }) {
               <div className="grid size-12 place-items-center rounded-full bg-brand-soft text-brand">
                 <Icon name="check" />
               </div>
-              <h1 className="mt-5 font-serif text-4xl font-medium tracking-tight">Payment received</h1>
-              <p className="mt-3 text-ink-soft">
-                Your answers are saved only in the browser you filled them in, and we can&apos;t find them here. Open this
-                page in that browser, or fill in the form again: your purchase covers it for {SITE.editDays} days.
-              </p>
+              <h1 className="mt-5 font-serif text-4xl font-medium tracking-tight">{t.download.received}</h1>
+              <p className="mt-3 text-ink-soft">{t.download.noAnswers}</p>
               <Link href={`/create/${slug}`} className="mt-6 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 font-semibold text-white">
-                Fill in the form <Icon name="arrowRight" className="size-4" />
+                {t.download.fillIn} <Icon name="arrowRight" className="size-4" />
               </Link>
             </>
           ) : (
             <>
-              <ol className="flex items-center" aria-label="Your progress">
-                {["Answered", "Reviewed", "Paid", "Ready"].map((label, i, all) => (
+              <ol className="flex items-center" aria-label={t.download.progressLabel}>
+                {t.download.progress.map((label, i, all) => (
                   <li key={label} className="flex items-center">
                     <span className="flex flex-col items-center gap-1.5">
                       <span
@@ -115,8 +110,8 @@ export function DownloadClient({ slug }: { slug: string }) {
                   </li>
                 ))}
               </ol>
-              <h1 className="mt-7 font-serif text-4xl font-medium tracking-tight sm:text-5xl">Your {template.shortName} is ready</h1>
-              <p className="mt-3 text-lg text-ink-soft">Thanks for your purchase. It&apos;s yours to keep, with no subscription and nothing to cancel.</p>
+              <h1 className="mt-7 font-serif text-4xl font-medium tracking-tight sm:text-5xl">{t.download.ready(template.shortName)}</h1>
+              <p className="mt-3 text-lg text-ink-soft">{t.download.thanks}</p>
               <div className="mt-7 flex flex-wrap gap-3">
                 {state.kind === "ready" ? (
                   <a
@@ -124,22 +119,24 @@ export function DownloadClient({ slug }: { slug: string }) {
                     download={`${slug}.pdf`}
                     className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3.5 font-semibold text-white shadow-sm hover:bg-brand-dark"
                   >
-                    <Icon name="download" className="size-4" /> Download PDF
+                    <Icon name="download" className="size-4" /> {t.download.downloadPdf}
                   </a>
                 ) : (
-                  <span className="inline-flex items-center gap-2 rounded-full bg-brand/70 px-6 py-3.5 font-semibold text-white">Preparing your PDF…</span>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-brand/70 px-6 py-3.5 font-semibold text-white">{t.download.preparing}</span>
                 )}
                 <Link href={`/create/${slug}?step=review`} className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-6 py-3.5 font-semibold hover:border-ink/30">
-                  <Icon name="edit" className="size-4" /> Edit answers
+                  <Icon name="edit" className="size-4" /> {t.download.editAnswers}
                 </Link>
               </div>
               <div className="mt-10 rounded-2xl border border-line bg-white p-6">
-                <h2 className="font-medium">What to do next</h2>
+                <h2 className="font-medium">{t.download.nextTitle}</h2>
                 <ol className="mt-3 space-y-3 text-sm text-ink-soft">
-                  <li className="flex gap-3"><span className="grid size-6 shrink-0 place-items-center rounded-full bg-cream text-xs font-semibold text-ink">1</span>Read it through once more and make sure every name and number is right.</li>
-                  <li className="flex gap-3"><span className="grid size-6 shrink-0 place-items-center rounded-full bg-cream text-xs font-semibold text-ink">2</span>Print it, or sign it electronically. Every party signs and keeps a copy.</li>
-                  <li className="flex gap-3"><span className="grid size-6 shrink-0 place-items-center rounded-full bg-cream text-xs font-semibold text-ink">3</span>If it has a notary section, sign that part in front of a notary.</li>
-                  <li className="flex gap-3"><span className="grid size-6 shrink-0 place-items-center rounded-full bg-cream text-xs font-semibold text-ink">4</span>Need a change? Edit and download again free for {SITE.editDays} days, from this browser.</li>
+                  {t.download.next.map((x, i) => (
+                    <li key={x} className="flex gap-3">
+                      <span className="grid size-6 shrink-0 place-items-center rounded-full bg-cream text-xs font-semibold text-ink">{i + 1}</span>
+                      {x}
+                    </li>
+                  ))}
                 </ol>
               </div>
             </>

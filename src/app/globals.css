@@ -64,6 +64,10 @@ body {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='220'><text x='50%' y='50%' fill='rgba(20,23,31,0.045)' font-family='Inter, sans-serif' font-size='30' font-weight='700' text-anchor='middle' transform='rotate(-28 160 110)'>PREVIEW</text></svg>");
 }
 
+.watermark[data-lang="nb"] {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='220'><text x='50%' y='50%' fill='rgba(20,23,31,0.045)' font-family='Inter, sans-serif' font-size='30' font-weight='700' text-anchor='middle' transform='rotate(-28 160 110)'>UTKAST</text></svg>");
+}
+
 @keyframes rise {
   from {
     opacity: 0;

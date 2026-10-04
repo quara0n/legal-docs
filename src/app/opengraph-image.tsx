@@ -1,9 +1,10 @@
+import { t } from "@/i18n";
 import { ogImage, ogSize } from "@/lib/og";
 
 export const size = ogSize;
 export const contentType = "image/png";
-export const alt = "Legal documents at one honest price";
+export const alt = t.meta.ogAlt;
 
 export default function Image() {
-  return ogImage({ eyebrow: "No subscription. No account.", title: "Legal documents at one honest price.", footer: "Preview free · Pay once · Keep forever" });
+  return ogImage({ eyebrow: t.meta.ogEyebrow, title: t.meta.ogTitle, footer: t.meta.ogFooter });
 }

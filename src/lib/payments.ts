@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { t } from "@/i18n";
 import { SITE } from "./site";
 
 // Stripe Checkout, one-time payments only. Without STRIPE_SECRET_KEY the app
@@ -11,26 +12,26 @@ export const demoMode = !stripe;
 export type Verification = { ok: true; slug: string; createdAt: number } | { ok: false; reason: string };
 
 export async function verifyPurchase(sessionId: string, slug: string): Promise<Verification> {
-  if (!sessionId) return { ok: false, reason: "Missing purchase reference." };
+  if (!sessionId) return { ok: false, reason: t.api.missingRef };
 
   if (sessionId.startsWith("demo_")) {
-    if (!demoMode) return { ok: false, reason: "Demo purchases are disabled." };
+    if (!demoMode) return { ok: false, reason: t.api.demoDisabled };
     const [, demoSlug, ts] = sessionId.split("__");
-    if (demoSlug !== slug) return { ok: false, reason: "This purchase is for a different document." };
+    if (demoSlug !== slug) return { ok: false, reason: t.api.otherDoc };
     return { ok: true, slug, createdAt: Number(ts) || Date.now() };
   }
 
-  if (!stripe) return { ok: false, reason: "Payments are not configured." };
+  if (!stripe) return { ok: false, reason: t.api.notConfigured };
   let session: Stripe.Checkout.Session;
   try {
     session = await stripe.checkout.sessions.retrieve(sessionId);
   } catch {
-    return { ok: false, reason: "We couldn't find that purchase." };
+    return { ok: false, reason: t.api.notFound };
   }
-  if (session.payment_status !== "paid") return { ok: false, reason: "Payment has not completed yet." };
-  if (session.metadata?.slug !== slug) return { ok: false, reason: "This purchase is for a different document." };
+  if (session.payment_status !== "paid") return { ok: false, reason: t.api.notPaid };
+  if (session.metadata?.slug !== slug) return { ok: false, reason: t.api.otherDoc };
   const createdAt = session.created * 1000;
   if (Date.now() - createdAt > SITE.editDays * 86400_000)
-    return { ok: false, reason: `Free edits ended ${SITE.editDays} days after purchase. Your earlier download is still yours to keep.` };
+    return { ok: false, reason: t.api.editsEnded };
   return { ok: true, slug, createdAt };
 }

@@ -1,14 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { t } from "@/i18n";
 import { Icon, type IconName } from "./Icon";
 
-const STAGES: { icon: IconName; title: string; short: string; text: string }[] = [
-  { icon: "file", short: "Choose", title: "Pick your document", text: "Choose from leases, NDAs, contracts and more. The price is on the card before you start." },
-  { icon: "edit", short: "Answer", title: "Answer plain-English questions", text: "One simple question at a time, with help text where you need it. No legal jargon, no 40-field forms." },
-  { icon: "eye", short: "Preview", title: "Watch it write itself", text: "Every answer appears in the document instantly, highlighted, so you always know exactly what you're signing." },
-  { icon: "download", short: "Download", title: "Pay once, download, sign", text: "Happy with it? Pay once and get a clean, print-ready PDF. No subscription, nothing to cancel." },
-];
+const STAGES = t.showcase.stages as { icon: IconName; title: string; short: string; text: string }[];
 
 export function JourneyShowcase({ minPrice }: { minPrice: string }) {
   const [active, setActive] = useState(0);
@@ -16,8 +12,8 @@ export function JourneyShowcase({ minPrice }: { minPrice: string }) {
 
   useEffect(() => {
     if (paused) return;
-    const t = setInterval(() => setActive((a) => (a + 1) % STAGES.length), 3800);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setActive((a) => (a + 1) % STAGES.length), 3800);
+    return () => clearInterval(timer);
   }, [paused]);
 
   const stage = STAGES[active];
@@ -31,7 +27,7 @@ export function JourneyShowcase({ minPrice }: { minPrice: string }) {
             style={{ width: `${(active / (STAGES.length - 1)) * 100}%` }}
           />
         </div>
-        <ol className="relative grid grid-cols-4" role="tablist" aria-label="How it works">
+        <ol className="relative grid grid-cols-4" role="tablist" aria-label={t.showcase.label}>
           {STAGES.map((s, i) => {
             const state = i < active ? "done" : i === active ? "current" : "todo";
             return (
@@ -70,7 +66,7 @@ export function JourneyShowcase({ minPrice }: { minPrice: string }) {
       {/* The detail panel */}
       <div id="journey-panel" role="tabpanel" className="mx-auto mt-12 grid max-w-4xl items-center gap-8 rounded-3xl border border-line bg-white p-6 shadow-[0_24px_60px_-30px_rgba(20,23,31,0.35)] sm:p-10 md:grid-cols-2">
         <div key={active} className="animate-step-fwd">
-          <p className="text-xs font-semibold tracking-[0.14em] text-brand uppercase">Step {active + 1} of 4</p>
+          <p className="text-xs font-semibold tracking-[0.14em] text-brand uppercase">{t.showcase.stepOf(active + 1)}</p>
           <h3 className="mt-2 font-serif text-3xl font-medium tracking-tight">{stage.title}</h3>
           <p className="mt-3 leading-relaxed text-ink-soft">{stage.text}</p>
           <div className="mt-6 flex gap-1.5" aria-hidden="true">
@@ -91,11 +87,7 @@ function Visual({ stage, minPrice }: { stage: number; minPrice: string }) {
   if (stage === 0)
     return (
       <div className="grid w-full max-w-xs gap-2.5">
-        {[
-          ["shield", "Non-Disclosure Agreement", "$9"],
-          ["home", "Residential Lease", "$19"],
-          ["receipt", "Bill of Sale", "$9"],
-        ].map(([icon, name, p], i) => (
+        {t.showcase.docs.map(([icon, name, p], i) => (
           <div key={name} className={`flex items-center gap-3 rounded-xl border bg-white px-3.5 py-3 text-sm ${i === 0 ? "border-ink shadow-md" : "border-line"}`}>
             <span className="grid size-8 place-items-center rounded-lg bg-brand-soft text-brand">
               <Icon name={icon as IconName} className="size-4" />
@@ -109,14 +101,14 @@ function Visual({ stage, minPrice }: { stage: number; minPrice: string }) {
   if (stage === 1)
     return (
       <div className="w-full max-w-xs rounded-2xl border border-line bg-white p-5 shadow-md">
-        <p className="font-serif text-xl font-medium">Who is receiving it?</p>
-        <p className="mt-3 text-xs font-medium">Full legal name</p>
+        <p className="font-serif text-xl font-medium">{t.showcase.question}</p>
+        <p className="mt-3 text-xs font-medium">{t.showcase.fieldLabel}</p>
         <div className="mt-1.5 rounded-lg border-2 border-brand px-3 py-2 text-sm">
-          Daniel Cho<span className="ml-px inline-block h-4 w-px translate-y-0.5 animate-pulse bg-ink" />
+          {t.showcase.answer}<span className="ml-px inline-block h-4 w-px translate-y-0.5 animate-pulse bg-ink" />
         </div>
         <div className="mt-4 flex justify-end">
           <span className="inline-flex items-center gap-1 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white">
-            Continue <Icon name="arrowRight" className="size-3.5" />
+            {t.home.continue} <Icon name="arrowRight" className="size-3.5" />
           </span>
         </div>
       </div>
@@ -124,11 +116,12 @@ function Visual({ stage, minPrice }: { stage: number; minPrice: string }) {
   if (stage === 2)
     return (
       <div className="w-full max-w-xs rounded-md bg-white px-6 py-6 font-serif text-[12.5px] leading-relaxed shadow-md">
-        <p className="mb-2 text-center text-[15px] font-semibold">Non-Disclosure Agreement</p>
+        <p className="mb-2 text-center text-[15px] font-semibold">{t.showcase.docTitle}</p>
         <p>
-          This Agreement is made between <strong>Northwind Labs LLC</strong> and{" "}
-          <span className="rounded bg-honey-soft px-0.5 font-semibold ring-2 ring-honey">Daniel Cho</span> for the purpose of{" "}
-          <span className="rounded bg-[#f1efe9] px-0.5 text-[#8a867c] italic">[purpose]</span>.
+          {t.showcase.docText(
+            <span className="rounded bg-honey-soft px-0.5 font-semibold ring-2 ring-honey">{t.showcase.answer}</span>,
+            <span className="rounded bg-[#f1efe9] px-0.5 text-[#8a867c] italic">{t.showcase.purpose}</span>,
+          )}
         </p>
         <div className="mt-3 space-y-1.5" aria-hidden="true">
           <div className="h-1.5 w-full rounded bg-[#ece9e2]" />
@@ -141,18 +134,18 @@ function Visual({ stage, minPrice }: { stage: number; minPrice: string }) {
     <div className="w-full max-w-xs space-y-3">
       <div className="rounded-2xl border border-line bg-white p-5 shadow-md">
         <div className="flex items-baseline justify-between">
-          <span className="text-sm font-medium">One-time payment</span>
-          <span className="font-serif text-2xl font-medium">from {minPrice}</span>
+          <span className="text-sm font-medium">{t.showcase.oneTime}</span>
+          <span className="font-serif text-2xl font-medium">{t.showcase.from(minPrice)}</span>
         </div>
         <div className="mt-3 flex items-center justify-center gap-2 rounded-full bg-brand py-2.5 text-sm font-semibold text-white">
-          <Icon name="lock" className="size-4" /> Pay and download
+          <Icon name="lock" className="size-4" /> {t.showcase.payDownload}
         </div>
       </div>
       <div className="flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-3 text-sm shadow-sm">
         <span className="grid size-9 place-items-center rounded-lg bg-[#fde8e7] text-[11px] font-bold text-[#b42318]">PDF</span>
         <span className="flex-1">
-          <span className="block font-medium">nda.pdf</span>
-          <span className="text-xs text-muted">Ready to print and sign</span>
+          <span className="block font-medium">{t.showcase.file}</span>
+          <span className="text-xs text-muted">{t.showcase.fileReady}</span>
         </span>
         <Icon name="check" className="size-5 text-brand" strokeWidth={2.6} />
       </div>

@@ -1,4 +1,6 @@
 import { getTemplate } from "@/content";
+import { t } from "@/i18n";
+import { MARKET } from "@/lib/market";
 import { withDefaults, type Answers } from "@/lib/doc";
 import { verifyPurchase } from "@/lib/payments";
 import { renderPdf } from "@/lib/pdf";
@@ -6,7 +8,7 @@ import { renderPdf } from "@/lib/pdf";
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as { slug?: string; sessionId?: string; answers?: Answers };
   const template = body.slug ? getTemplate(body.slug) : undefined;
-  if (!template) return Response.json({ error: "Unknown document." }, { status: 400 });
+  if (!template) return Response.json({ error: t.api.unknownDoc }, { status: 400 });
 
   const check = await verifyPurchase(body.sessionId ?? "", template.slug);
   if (!check.ok) return Response.json({ error: check.reason }, { status: 402 });
@@ -16,7 +18,10 @@ export async function POST(request: Request) {
 
   const bytes = await renderPdf(template.render(withDefaults(template, answers)), {
     title: template.name,
-    note: "This document was prepared from a self-help template. It is not legal advice and was not reviewed by an attorney. Laws vary by state; you are responsible for making sure it fits your situation.",
+    note: t.api.pdfNote,
+    pageLabel: t.pdf.page,
+    initials: t.pdf.initials,
+    size: MARKET === "no" ? "a4" : "letter",
   });
   return new Response(Buffer.from(bytes), {
     headers: {

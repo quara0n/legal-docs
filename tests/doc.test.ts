@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { completeness, formatDate, formatMoney, formatPrice, joinList, makeCtx, parseInline, plainText } from "@/lib/doc";
+import { completeness, formatDate, formatMoney, formatPrice, joinList, makeCtx, parseAmount, parseInline, plainText } from "@/lib/doc";
 
 describe("inline tokens", () => {
   it("parses filled, empty and bold segments", () => {
@@ -47,5 +47,22 @@ describe("completeness", () => {
       { type: "signatures", parties: [{ heading: "A", lines: [{ label: "Name", value: "⟦c¦?c⟧" }] }] },
     ]);
     expect(r).toEqual({ filled: 1, total: 3, pct: 33 });
+  });
+});
+
+describe("Norwegian formatting", () => {
+  it("reads amounts the way Norwegians type them", () => {
+    expect(parseAmount("5 000", "nb-NO")).toBe(5000);
+    expect(parseAmount("5.000", "nb-NO")).toBe(5000);
+    expect(parseAmount("1 250,50", "nb-NO")).toBe(1250.5);
+    expect(parseAmount("12 000,-", "nb-NO")).toBe(12000);
+  });
+
+  it("formats money, prices, dates and lists", () => {
+    expect(formatMoney("12000", "nb-NO")).toBe("kr 12 000,-");
+    expect(formatMoney("1250,5", "nb-NO")).toBe("kr 1 250,50");
+    expect(formatPrice(19900, "nb-NO")).toBe("199 kr");
+    expect(formatDate("2026-10-04", "nb-NO")).toBe("4. oktober 2026");
+    expect(joinList(["a", "b", "c"], "og")).toBe("a, b og c");
   });
 });

@@ -1,6 +1,8 @@
 "use client";
 
+import { t } from "@/i18n";
 import type { Field as FieldDef } from "@/lib/doc";
+import { MARKET } from "@/lib/market";
 import { Icon } from "./Icon";
 
 const inputCls =
@@ -97,11 +99,11 @@ export function Field({ field, value, error, regions, onChange, onFocus, onEnter
         <div className="space-y-2">
           <div className="flex gap-3 text-sm">
             <button type="button" className="font-medium text-brand hover:underline" onClick={() => onChange(field.options!.map((o) => o.value).join(","))}>
-              Select all
+              {t.field.selectAll}
             </button>
             <span className="text-line">|</span>
             <button type="button" className="font-medium text-brand hover:underline" onClick={() => onChange("")}>
-              Clear
+              {t.field.clear}
             </button>
           </div>
           <div className="grid gap-2">
@@ -130,7 +132,7 @@ export function Field({ field, value, error, regions, onChange, onFocus, onEnter
       control = (
         <div className="relative">
           <select {...common} className={`${inputCls} appearance-none pr-10`} value={value} onChange={(e) => onChange(e.target.value)}>
-            {field.type === "region" && <option value="">Choose…</option>}
+            {field.type === "region" && <option value="">{t.field.choose}</option>}
             {options.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
@@ -147,14 +149,14 @@ export function Field({ field, value, error, regions, onChange, onFocus, onEnter
     case "money":
       control = (
         <div className="relative">
-          <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-muted">$</span>
+          <span className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted ${MARKET === "no" ? "right-4" : "left-3.5"}`}>{MARKET === "no" ? "kr" : "$"}</span>
           <input
             {...common}
             inputMode="decimal"
-            className={`${inputCls} pl-7`}
+            className={`${inputCls} ${MARKET === "no" ? "pr-11" : "pl-7"}`}
             placeholder={field.placeholder}
             value={value}
-            onChange={(e) => onChange(e.target.value.replace(/[^0-9.,]/g, ""))}
+            onChange={(e) => onChange(e.target.value.replace(MARKET === "no" ? /[^0-9., ]/g : /[^0-9.,]/g, ""))}
             onKeyDown={enter}
           />
         </div>

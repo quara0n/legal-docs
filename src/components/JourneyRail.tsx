@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/i18n";
 import { Icon, type IconName } from "./Icon";
 
 export interface JourneyNode {
@@ -16,7 +17,7 @@ export function JourneyRail({ title, pct, nodes, price }: { title: string; pct: 
   const r = 22;
   const c = 2 * Math.PI * r;
   return (
-    <aside className="hidden min-h-0 flex-col overflow-y-auto bg-ink text-white xl:flex" aria-label="Your path to a finished document">
+    <aside className="hidden min-h-0 flex-col overflow-y-auto bg-ink text-white xl:flex" aria-label={t.rail.label}>
       <div className="flex items-center gap-4 border-b border-white/10 px-6 py-6">
         <svg viewBox="0 0 56 56" className="size-14 shrink-0 -rotate-90" aria-hidden="true">
           <circle cx="28" cy="28" r={r} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="5" />
@@ -34,9 +35,9 @@ export function JourneyRail({ title, pct, nodes, price }: { title: string; pct: 
           />
         </svg>
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold tracking-[0.14em] text-white/50 uppercase">Your path</p>
+          <p className="text-[11px] font-semibold tracking-[0.14em] text-white/50 uppercase">{t.rail.yourPath}</p>
           <p className="truncate font-serif text-lg leading-tight">{title}</p>
-          <p className="mt-0.5 text-xs text-mint tabular-nums">{pct}% filled in</p>
+          <p className="mt-0.5 text-xs text-mint tabular-nums">{t.rail.filledIn(pct)}</p>
         </div>
       </div>
 
@@ -83,7 +84,7 @@ export function JourneyRail({ title, pct, nodes, price }: { title: string; pct: 
                   {n.summary ? (
                     <span className="mt-0.5 block truncate text-xs text-white/50">{n.summary}</span>
                   ) : n.state === "current" ? (
-                    <span className="mt-0.5 block text-xs text-honey">You are here</span>
+                    <span className="mt-0.5 block text-xs text-honey">{t.rail.here}</span>
                   ) : null}
                 </span>
               </Tag>
@@ -94,9 +95,9 @@ export function JourneyRail({ title, pct, nodes, price }: { title: string; pct: 
 
       <div className="m-4 rounded-xl border border-white/10 bg-white/[0.04] p-4 text-xs leading-relaxed text-white/65">
         <p className="font-semibold text-white">
-          {price} once, at the very end
+          {t.rail.once(price)}
         </p>
-        <p className="mt-1">No account, no card and no email until you choose to download.</p>
+        <p className="mt-1">{t.rail.noAccount}</p>
       </div>
     </aside>
   );
