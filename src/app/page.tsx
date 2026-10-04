@@ -112,6 +112,30 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Trust strip */}
+        <section aria-label="Why people trust us" className="border-t border-line bg-paper">
+          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-8 sm:px-6 md:grid-cols-4">
+            {(
+              [
+                { icon: "lock", title: "Private by design", text: "Answers stay in your browser" },
+                { icon: "shield", title: "Secure checkout", text: "Payments handled by Stripe" },
+                { icon: "refresh", title: "14-day refund", text: "No forms, no questions" },
+                { icon: "file", title: "Yours forever", text: "Clean PDF, no watermark" },
+              ] as { icon: IconName; title: string; text: string }[]
+            ).map((x) => (
+              <div key={x.title} className="flex items-start gap-3">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-cream text-brand">
+                  <Icon name={x.icon} className="size-4.5" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold">{x.title}</p>
+                  <p className="text-[13px] text-muted">{x.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Documents */}
         <section className="border-y border-line bg-white/60 py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">

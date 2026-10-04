@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getLocale, getTemplate } from "@/content";
 import {
+  completeness,
   formatDate,
   formatMoney,
   formatPrice,
@@ -31,6 +32,7 @@ export function Wizard({ slug }: { slug: string }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [hydrated, setHydrated] = useState(false);
   const [mobilePreview, setMobilePreview] = useState(false);
+  const [dir, setDir] = useState<"fwd" | "back">("fwd");
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState("");
   const [purchase, setPurchase] = useState<Purchase | null>(null);
@@ -46,7 +48,7 @@ export function Wizard({ slug }: { slug: string }) {
   const step = isReview ? null : steps[stepIndex];
   const blocks = useMemo(() => template.render(answers), [template, answers]);
   const totalSteps = steps.length + 1;
-  const progress = Math.round(((Math.min(stepIndex, reviewIndex) + (isReview ? 1 : 0)) / totalSteps) * 100);
+  const done = useMemo(() => completeness(blocks), [blocks]);
 
   // Restore a saved draft (and an earlier purchase) after hydration. The page is
   // prerendered, so browser storage can only be read once mounted.
@@ -88,6 +90,7 @@ export function Wizard({ slug }: { slug: string }) {
   }, []);
 
   const goTo = (i: number) => {
+    setDir(i < stepIndex ? "back" : "fwd");
     setStepIndex(i);
     setErrors({});
     setActive(null);
@@ -134,59 +137,96 @@ export function Wizard({ slug }: { slug: string }) {
   };
 
   const price = formatPrice(template.price);
+  const stepTitle = step ? resolve(step.title, answers) : "Review and download";
+  const currentLabel = step ? step.label : "Review";
+
+  const primaryLabel = stepIndex === reviewIndex - 1 ? "Review document" : "Continue";
 
   return (
-    <div className="flex min-h-screen flex-col bg-cream/50 lg:h-screen lg:overflow-hidden">
+    <div className="flex min-h-screen flex-col bg-[#f7f5f0] lg:h-screen lg:overflow-hidden">
       {/* Top bar */}
-      <header className="z-20 shrink-0 border-b border-line bg-paper">
+      <header className="z-20 shrink-0 border-b border-line bg-paper/90 backdrop-blur">
         <div className="flex h-14 items-center gap-3 px-4 sm:px-6">
           <Logo />
           <span className="hidden h-5 w-px bg-line sm:block" />
           <span className="hidden truncate text-sm font-medium text-ink-soft sm:block">{template.name}</span>
-          <span
-            className="hidden items-center gap-1 text-xs text-muted md:flex">
-            <Icon name="check" className="size-3.5" /> Saved in this browser
+          <span className="hidden items-center gap-1.5 rounded-full border border-line bg-white px-2.5 py-1 text-[11.5px] text-muted md:inline-flex">
+            <span className="size-1.5 rounded-full bg-brand" /> Autosaved in this browser
           </span>
           <div className="ml-auto flex items-center gap-2">
-            <span className="hidden rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-brand-dark sm:inline">
-              {price} one-time · pay only to download
+            <span className="hidden items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-brand-dark sm:inline-flex">
+              <span className="font-semibold">{price}</span> one-time · pay only to download
             </span>
-            <Link href={`/documents/${slug}`} className="rounded-lg p-2 text-muted hover:bg-cream hover:text-ink" aria-label="Close editor">
+            <Link href={`/documents/${slug}`} className="rounded-lg p-2 text-muted transition hover:bg-cream hover:text-ink" aria-label="Close editor">
               <Icon name="x" />
             </Link>
           </div>
         </div>
-        <div className="h-1 bg-line/60">
-          <div className="h-full bg-brand transition-all duration-500" style={{ width: `${progress}%` }} />
-        </div>
       </header>
 
-      <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[minmax(420px,1fr)_minmax(0,1.15fr)]">
+      <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[minmax(440px,1fr)_minmax(0,1.15fr)]">
         {/* Form */}
         <main className="lg:overflow-y-auto" aria-label="Questions">
-          <div ref={formTopRef} className="mx-auto w-full max-w-xl px-5 pt-8 pb-32 sm:px-8 lg:pt-12">
-            <div className="mb-6 flex items-center justify-between text-[13px] text-muted">
-              <span>
-                {isReview ? "Last step" : `Step ${stepIndex + 1} of ${totalSteps}`}
-                <span className="text-brand-dark sm:hidden"> · {price} once, pay only to download</span>
-              </span>
-              <span className="flex items-center gap-1">
-                <Icon name="clock" className="size-3.5" /> About {template.minutes} min
-              </span>
-            </div>
+          <div ref={formTopRef} className="mx-auto w-full max-w-xl scroll-mt-20 px-5 pt-7 pb-36 sm:px-8 lg:pt-12 lg:pb-16">
+            {/* Stepper */}
+            <nav aria-label="Progress" className="mb-9">
+              <div className="flex items-baseline justify-between gap-3 text-[13px]">
+                <p className="text-muted">
+                  <span className="font-semibold text-ink">
+                    {isReview ? "Final step" : `Step ${stepIndex + 1}`}
+                  </span>{" "}
+                  of {totalSteps} <span className="mx-1 text-line">/</span>
+                  <span className="text-ink-soft">{currentLabel}</span>
+                </p>
+                <p className="flex shrink-0 items-center gap-1 text-muted">
+                  <Icon name="clock" className="size-3.5" /> ~{template.minutes} min
+                </p>
+              </div>
+              <ol className="mt-3 flex gap-1.5">
+                {[...steps.map((s) => s.label), "Review"].map((label, i) => {
+                  const state = i < stepIndex ? "done" : i === stepIndex ? "current" : "todo";
+                  return (
+                    <li key={label + i} className="flex-1">
+                      <button
+                        type="button"
+                        onClick={() => goTo(i)}
+                        aria-current={state === "current" ? "step" : undefined}
+                        aria-label={`Step ${i + 1}: ${label}${state === "done" ? " (done)" : ""}`}
+                        title={label}
+                        className="group block w-full py-1.5"
+                      >
+                        <span className="block h-1.5 overflow-hidden rounded-full bg-[#e4dfd3] transition group-hover:bg-[#d8d2c4]">
+                          <span
+                            className={`block h-full rounded-full transition-all duration-500 ease-out ${
+                              state === "done" ? "w-full bg-brand" : state === "current" ? "w-1/2 bg-ink" : "w-0"
+                            }`}
+                          />
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </nav>
 
             {!hydrated ? (
-              <div className="h-64 animate-pulse rounded-2xl bg-line/40" />
+              <div aria-hidden="true" className="space-y-4">
+                <div className="h-9 w-3/4 animate-pulse rounded-lg bg-[#e9e5dc]" />
+                <div className="h-4 w-1/2 animate-pulse rounded bg-[#eeebe3]" />
+                <div className="mt-8 h-12 animate-pulse rounded-xl bg-[#eeebe3]" />
+                <div className="h-12 animate-pulse rounded-xl bg-[#eeebe3]" />
+              </div>
             ) : step ? (
-              <div key={step.id} className="animate-rise">
-                <h1 className="font-serif text-[30px] leading-tight font-medium tracking-tight sm:text-[34px]">{resolve(step.title, answers)}</h1>
-                {step.description && <p className="mt-2 text-[15px] text-ink-soft">{resolve(step.description, answers)}</p>}
+              <div key={step.id} className={dir === "fwd" ? "animate-step-fwd" : "animate-step-back"}>
+                <h1 className="font-serif text-[32px] leading-[1.1] font-medium tracking-[-0.015em] text-balance sm:text-[38px]">{stepTitle}</h1>
+                {step.description && <p className="mt-3 text-[15.5px] leading-relaxed text-ink-soft">{resolve(step.description, answers)}</p>}
                 <form
-                  className="mt-7 grid gap-5 sm:grid-cols-2"
+                  className="mt-8 grid gap-x-4 gap-y-6 sm:grid-cols-2"
                   onSubmit={(e) => {
                     e.preventDefault();
                     next();
                   }}
+                  noValidate
                 >
                   {visibleFields(step, answers).map((f, i) => (
                     <Field
@@ -205,64 +245,52 @@ export function Wizard({ slug }: { slug: string }) {
                     />
                   ))}
                 </form>
-                <div className="mt-9 flex items-center gap-3">
+                <div className="mt-10 hidden items-center gap-3 lg:flex">
                   {stepIndex > 0 && (
                     <button
                       type="button"
                       onClick={() => goTo(stepIndex - 1)}
-                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 text-sm font-medium text-ink-soft hover:bg-white hover:text-ink"
+                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 text-sm font-medium text-ink-soft transition hover:bg-white hover:text-ink"
                     >
                       <Icon name="arrowLeft" className="size-4" /> Back
                     </button>
                   )}
+                  <span className="ml-auto hidden text-xs text-muted xl:inline">
+                    or press <kbd className="rounded-md border border-line bg-white px-1.5 py-0.5 font-sans shadow-[0_1px_0_#e6e2d9]">Enter ↵</kbd>
+                  </span>
                   <button
                     type="button"
                     onClick={next}
-                    className="ml-auto inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-black focus-visible:ring-4 focus-visible:ring-ink/20 focus-visible:outline-none"
+                    className="group ml-auto inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_8px_20px_-8px_rgba(20,23,31,0.6)] transition hover:-translate-y-px hover:bg-black active:translate-y-0 xl:ml-0"
                   >
-                    {stepIndex === reviewIndex - 1 ? "Review document" : "Continue"} <Icon name="arrowRight" className="size-4" />
+                    {primaryLabel} <Icon name="arrowRight" className="size-4 transition group-hover:translate-x-0.5" />
                   </button>
                 </div>
-                <p className="mt-4 text-right text-xs text-muted">
-                  Press <kbd className="rounded border border-line bg-white px-1.5 py-0.5 font-sans">Enter ↵</kbd> to continue
-                </p>
               </div>
             ) : (
-              <Review
-                answers={answers}
-                steps={steps}
-                missing={missing.map((m) => ({ stepId: m.step.id, label: m.field.label }))}
-                onEdit={(i) => goTo(i)}
-                price={price}
-                paying={paying}
-                payError={payError}
-                purchase={purchase}
-                slug={slug}
-                onPay={pay}
-                regions={locale.regions}
-              />
+              <div className={dir === "fwd" ? "animate-step-fwd" : "animate-step-back"}>
+                <Review
+                  answers={answers}
+                  steps={steps}
+                  missing={missing.map((m) => ({ stepId: m.step.id, label: m.field.label }))}
+                  onEdit={(i) => goTo(i)}
+                  price={price}
+                  paying={paying}
+                  payError={payError}
+                  purchase={purchase}
+                  slug={slug}
+                  onPay={pay}
+                  regions={locale.regions}
+                />
+              </div>
             )}
 
             {hydrated && (
-              <div className="mt-14 flex flex-wrap items-center gap-x-1 gap-y-2 border-t border-line pt-5 text-[13px]">
-                {steps.map((s, i) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => goTo(i)}
-                    className={`rounded-full px-2.5 py-1 transition ${i === stepIndex ? "bg-ink text-white" : i < stepIndex ? "text-ink-soft hover:bg-white" : "text-muted hover:bg-white"}`}
-                  >
-                    {i + 1}. {s.label}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => goTo(reviewIndex)}
-                  className={`rounded-full px-2.5 py-1 transition ${isReview ? "bg-ink text-white" : "text-muted hover:bg-white"}`}
-                >
-                  {reviewIndex + 1}. Review
-                </button>
-                <button type="button" onClick={startOver} className="ml-auto inline-flex items-center gap-1 text-muted hover:text-ink">
+              <div className="mt-14 flex items-center justify-between gap-4 border-t border-line pt-5 text-[12.5px] text-muted">
+                <span className="inline-flex items-center gap-1.5">
+                  <Icon name="lock" className="size-3.5" /> Your answers stay on this device until you download.
+                </span>
+                <button type="button" onClick={startOver} className="inline-flex shrink-0 items-center gap-1 transition hover:text-ink">
                   <Icon name="refresh" className="size-3.5" /> Start over
                 </button>
               </div>
@@ -271,44 +299,93 @@ export function Wizard({ slug }: { slug: string }) {
         </main>
 
         {/* Live preview (desktop) */}
-        <aside className="hidden border-l border-line bg-[#ece8df] lg:block lg:min-h-0" aria-label="Document preview">
-          <div ref={previewRef} className="h-full overflow-y-auto px-8 py-10 xl:px-14">
-            <div className="mx-auto mb-3 flex max-w-[680px] items-center justify-between text-xs text-ink-soft">
-              <span className="inline-flex items-center gap-1.5 font-medium">
-                <span className="relative flex size-2">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-50" />
-                  <span className="relative inline-flex size-2 rounded-full bg-brand" />
+        <aside className="hidden border-l border-line bg-[#e9e5dc] lg:block lg:min-h-0" aria-label="Document preview">
+          <div ref={previewRef} className="relative h-full overflow-y-auto">
+            <div className="sticky top-0 z-20 border-b border-[#ddd8cc] bg-[#e9e5dc]/90 px-8 py-3 backdrop-blur xl:px-14">
+              <div className="mx-auto flex max-w-[680px] items-center gap-4 text-xs text-ink-soft">
+                <span className="inline-flex items-center gap-1.5 font-medium text-ink">
+                  <span className="relative flex size-2">
+                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-50" />
+                    <span className="relative inline-flex size-2 rounded-full bg-brand" />
+                  </span>
+                  Live preview
                 </span>
-                Live preview
-              </span>
-              <span>Your PDF has no watermark</span>
+                <span className="ml-auto inline-flex items-center gap-2">
+                  <span className="h-1.5 w-24 overflow-hidden rounded-full bg-[#d6d0c2]">
+                    <span className="block h-full rounded-full bg-brand transition-all duration-500" style={{ width: `${done.pct}%` }} />
+                  </span>
+                  <span className="tabular-nums">
+                    {done.filled} of {done.total} details filled
+                  </span>
+                </span>
+              </div>
             </div>
-            <div className="mx-auto max-w-[680px] rounded-sm bg-white px-10 py-12 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_12px_40px_-12px_rgba(20,23,31,0.25)] xl:px-14 xl:py-16">
-              <DocPreview blocks={blocks} active={active} />
+            <div className="px-8 pt-8 pb-16 xl:px-14">
+              <div className="relative mx-auto max-w-[680px]">
+                <div className="absolute inset-x-3 -bottom-2 h-full rounded-sm bg-white/60 shadow-sm" aria-hidden="true" />
+                <div className="relative rounded-sm bg-white px-10 py-12 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_18px_50px_-18px_rgba(20,23,31,0.3)] xl:px-14 xl:py-16">
+                  <DocPreview blocks={blocks} active={active} />
+                </div>
+              </div>
+              <p className="mx-auto mt-6 max-w-[680px] text-center text-xs text-muted">
+                The watermark is only on the preview. Your PDF is clean, with page numbers and signature lines.
+              </p>
             </div>
           </div>
         </aside>
       </div>
 
-      {/* Mobile preview */}
-      <button
-        type="button"
-        onClick={() => setMobilePreview(true)}
-        className="fixed right-4 bottom-4 z-30 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white shadow-lg lg:hidden"
-      >
-        <Icon name="eye" className="size-4" /> Preview
-      </button>
-      {mobilePreview && (
-        <div className="fixed inset-0 z-40 flex flex-col bg-[#ece8df] lg:hidden" role="dialog" aria-modal="true" aria-label="Document preview">
-          <div className="flex h-14 shrink-0 items-center justify-between border-b border-line bg-paper px-4">
-            <span className="font-medium">{template.name}</span>
-            <button type="button" onClick={() => setMobilePreview(false)} className="rounded-lg p-2 hover:bg-cream" aria-label="Close preview">
-              <Icon name="x" />
+      {/* Mobile action bar */}
+      {hydrated && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+          <div className="mx-auto flex max-w-xl items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMobilePreview(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-ink"
+            >
+              <Icon name="eye" className="size-4" /> Preview
+              <span className="rounded-full bg-brand-soft px-1.5 py-0.5 text-[11px] font-semibold text-brand-dark tabular-nums">{done.pct}%</span>
             </button>
+            {stepIndex > 0 && (
+              <button type="button" onClick={() => goTo(stepIndex - 1)} className="grid size-12 shrink-0 place-items-center rounded-full text-ink-soft hover:bg-white" aria-label="Back">
+                <Icon name="arrowLeft" className="size-5" />
+              </button>
+            )}
+            {step && (
+              <button type="button" onClick={next} className="ml-auto inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white">
+                {primaryLabel} <Icon name="arrowRight" className="size-4" />
+              </button>
+            )}
           </div>
-          <div ref={mobilePreviewRef} className="flex-1 overflow-y-auto p-4">
-            <div className="rounded-sm bg-white px-5 py-7 shadow">
-              <DocPreview blocks={blocks} active={active} />
+        </div>
+      )}
+
+      {/* Mobile preview sheet */}
+      {mobilePreview && (
+        <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Document preview">
+          <button type="button" className="animate-fade absolute inset-0 bg-ink/40" aria-label="Close preview" onClick={() => setMobilePreview(false)} />
+          <div className="animate-sheet absolute inset-x-0 top-6 bottom-0 flex flex-col overflow-hidden rounded-t-3xl bg-[#e9e5dc] shadow-2xl">
+            <div className="flex shrink-0 items-center justify-between border-b border-[#ddd8cc] bg-paper px-5 py-3">
+              <div>
+                <p className="text-sm font-semibold">{template.name}</p>
+                <p className="text-xs text-muted tabular-nums">
+                  {done.filled} of {done.total} details filled
+                </p>
+              </div>
+              <button type="button" onClick={() => setMobilePreview(false)} className="rounded-full bg-cream p-2" aria-label="Close preview">
+                <Icon name="x" className="size-4" />
+              </button>
+            </div>
+            <div ref={mobilePreviewRef} className="flex-1 overflow-y-auto p-4">
+              <div className="rounded-sm bg-white px-5 py-7 shadow">
+                <DocPreview blocks={blocks} active={active} />
+              </div>
+            </div>
+            <div className="border-t border-line bg-paper p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+              <button type="button" onClick={() => setMobilePreview(false)} className="w-full rounded-full bg-ink py-3 text-sm font-semibold text-white">
+                Back to questions
+              </button>
             </div>
           </div>
         </div>
@@ -428,7 +505,7 @@ function Review(props: {
       <div className="mt-3 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
         {steps.map((s, i) => {
           const rows = visibleFields(s, answers)
-            .map((f) => ({ label: f.label, value: displayValue(f, answers[f.id] ?? "") }))
+            .map((f) => ({ label: f.type === "choice" ? "" : f.label, value: displayValue(f, answers[f.id] ?? "") }))
             .filter((r) => r.value);
           return (
             <div key={s.id} className="flex gap-4 p-4">
@@ -437,8 +514,8 @@ function Review(props: {
                 <dl className="mt-1 space-y-0.5 text-[13px] text-ink-soft">
                   {rows.length ? (
                     rows.slice(0, 4).map((r) => (
-                      <div key={r.label} className="flex gap-1.5">
-                        <dt className="shrink-0 text-muted">{r.label}:</dt>
+                      <div key={r.label + r.value} className="flex gap-1.5">
+                        {r.label && <dt className="shrink-0 text-muted">{r.label}:</dt>}
                         <dd className="truncate">{r.value.split("\n").join(", ")}</dd>
                       </div>
                     ))

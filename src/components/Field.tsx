@@ -4,7 +4,7 @@ import type { Field as FieldDef } from "@/lib/doc";
 import { Icon } from "./Icon";
 
 const inputCls =
-  "w-full rounded-xl border border-line bg-white px-3.5 py-3 text-[15px] text-ink shadow-[0_1px_0_rgba(0,0,0,0.02)] outline-none transition placeholder:text-[#a8a59d] focus:border-brand focus:ring-4 focus:ring-brand/12";
+  "w-full rounded-xl border border-line bg-white px-4 py-3.5 text-base text-ink sm:text-[15px] shadow-[0_1px_0_rgba(0,0,0,0.02)] outline-none transition placeholder:text-[#a8a59d] hover:border-[#d6d0c2] focus:border-brand focus:ring-4 focus:ring-brand/12 aria-[invalid=true]:border-[#e5484d] aria-[invalid=true]:ring-4 aria-[invalid=true]:ring-[#e5484d]/10";
 
 interface Props {
   field: FieldDef;
@@ -176,8 +176,8 @@ export function Field({ field, value, error, regions, onChange, onFocus, onEnter
   }
 
   return (
-    <div className={field.half ? "sm:col-span-1" : "sm:col-span-2"}>
-      <label id={`${id}-label`} htmlFor={field.type === "choice" || field.type === "multi" ? undefined : id} className="mb-1.5 block text-sm font-medium text-ink">
+    <div key={error ? "err" : "ok"} className={`${field.half ? "sm:col-span-1" : "sm:col-span-2"} ${error ? "animate-shake" : ""}`}>
+      <label id={`${id}-label`} htmlFor={field.type === "choice" || field.type === "multi" ? undefined : id} className="mb-2 block text-[14px] font-medium text-ink">
         {field.label}
         {field.required && <span className="ml-0.5 text-brand" aria-hidden="true">*</span>}
       </label>
@@ -188,7 +188,10 @@ export function Field({ field, value, error, regions, onChange, onFocus, onEnter
         </p>
       )}
       {error && (
-        <p id={`${id}-err`} className="mt-1.5 text-[13px] font-medium text-[#b42318]">
+        <p id={`${id}-err`} role="alert" className="mt-1.5 flex items-center gap-1.5 text-[13px] font-medium text-[#b42318]">
+          <svg viewBox="0 0 16 16" className="size-3.5 shrink-0" fill="currentColor" aria-hidden="true">
+            <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.75 3.5h1.5v4.75h-1.5V4.5zm.75 7.25a.9.9 0 110-1.8.9.9 0 010 1.8z" />
+          </svg>
           {error}
         </p>
       )}

@@ -221,3 +221,24 @@ export function missingRequired(t: Template, a: Answers) {
       if (field.required && !(a[field.id] ?? "").trim()) missing.push({ step, field });
   return missing;
 }
+
+// How much of the document is filled in, counted per distinct answer slot.
+export function completeness(blocks: Block[]) {
+  const seen = new Map<string, boolean>();
+  const scan = (text?: string) => {
+    if (!text) return;
+    for (const s of parseInline(text)) if (s.field) seen.set(s.field, (seen.get(s.field) ?? false) || !s.empty);
+  };
+  for (const b of blocks) {
+    if (b.type === "title" || b.type === "subtitle" || b.type === "paragraph" || b.type === "heading") scan(b.text);
+    else if (b.type === "list") b.items.forEach(scan);
+    else if (b.type === "clause") {
+      b.paragraphs.forEach(scan);
+      b.list?.forEach(scan);
+    } else if (b.type === "signatures") b.parties.forEach((p) => p.lines.forEach((l) => scan(l.value)));
+    else if (b.type === "notary") scan(b.state);
+  }
+  const total = seen.size;
+  const filled = [...seen.values()].filter(Boolean).length;
+  return { filled, total, pct: total ? Math.round((filled / total) * 100) : 100 };
+}
