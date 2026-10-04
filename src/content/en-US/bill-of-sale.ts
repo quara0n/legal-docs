@@ -44,7 +44,7 @@ export const billOfSale: Template = {
       },
       {
         q: "Does a bill of sale need to be notarized?",
-        a: "Most states don't require it, but a few do for vehicles or boats (for example Louisiana, Montana, Nebraska and West Virginia). You can include a notary section with one click.",
+        a: "Most states don't require it, but some do for certain vehicles, boats or title transfers. Check your state DMV's website before you sign. You can include a notary section with one click."
       },
       {
         q: "What does “as is” mean?",

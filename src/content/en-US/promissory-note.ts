@@ -1,4 +1,4 @@
-import { makeCtx, type Block, type Template } from "@/lib/doc";
+import { makeCtx, type Block, type Template, type Warning } from "@/lib/doc";
 import { governingLawField, partyFields, partyIntro, sigParty } from "./shared";
 
 const FREQ: Record<string, string> = { monthly: "monthly", biweekly: "every two weeks", weekly: "weekly" };
@@ -200,5 +200,21 @@ export const promissoryNote: Template = {
       },
     );
     return blocks;
+  },
+  warnings(a) {
+    const rate = Number((a.rate ?? "").replace(/[^0-9.]/g, ""));
+    const amount = Number((a.amount ?? "").replace(/[^0-9.]/g, ""));
+    const out: Warning[] = [];
+    if (rate > 10)
+      out.push({
+        level: "info",
+        text: `Every state caps interest on private loans (usury laws), and some caps are around 10% a year or lower. Check the limit for ${a.state || "your state"} before using ${rate}%. Charging more than allowed can cancel the interest or worse.`,
+      });
+    if (rate === 0 && amount > 10000)
+      out.push({
+        level: "info",
+        text: "Interest-free loans over $10,000 can have US tax consequences (the IRS may treat the missing interest as a gift or income). A tax adviser can tell you whether to charge the applicable federal rate.",
+      });
+    return out;
   },
 };

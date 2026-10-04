@@ -15,6 +15,7 @@ import {
   withDefaults,
   type Answers,
   type Field as FieldDef,
+  type Warning,
 } from "@/lib/doc";
 import { track } from "@/lib/analytics";
 import { SITE } from "@/lib/site";
@@ -24,6 +25,7 @@ import { Field } from "./Field";
 import { Icon } from "./Icon";
 import { JourneyRail, type JourneyNode } from "./JourneyRail";
 import { Logo } from "./Logo";
+import { Warnings } from "./Warnings";
 
 export function Wizard({ slug }: { slug: string }) {
   const template = getTemplate(slug)!;
@@ -114,6 +116,9 @@ export function Wizard({ slug }: { slug: string }) {
   };
 
   const missing = missingRequired(template, answers);
+  const warnings = template.warnings?.(answers) ?? [];
+  const stepFieldIds = new Set(step ? visibleFields(step, answers).map((f) => f.id) : []);
+  const showStepWarnings = stepFieldIds.has("state") || stepFieldIds.has("deposit") || stepFieldIds.has("rate") || stepFieldIds.has("effective") || stepFieldIds.has("builtBefore1978");
 
   const pay = async () => {
     setPaying(true);
@@ -272,6 +277,11 @@ export function Wizard({ slug }: { slug: string }) {
                     />
                   ))}
                 </form>
+                {showStepWarnings && warnings.length > 0 && (
+                  <div className="mt-6">
+                    <Warnings items={warnings} />
+                  </div>
+                )}
                 <div className="mt-10 hidden items-center gap-3 lg:flex">
                   {stepIndex > 0 && (
                     <button
@@ -300,6 +310,7 @@ export function Wizard({ slug }: { slug: string }) {
                   answers={answers}
                   steps={steps}
                   missing={missing.map((m) => ({ stepId: m.step.id, label: m.field.label }))}
+                  warnings={warnings}
                   onEdit={(i) => goTo(i)}
                   price={price}
                   paying={paying}
@@ -444,6 +455,7 @@ function Review(props: {
   answers: Answers;
   steps: ReturnType<typeof visibleSteps>;
   missing: { stepId: string; label: string }[];
+  warnings: Warning[];
   onEdit: (i: number) => void;
   price: string;
   paying: boolean;
@@ -453,14 +465,21 @@ function Review(props: {
   onPay: () => void;
   regions: string[];
 }) {
-  const { answers, steps, missing, onEdit, price, paying, payError, purchase, slug, onPay } = props;
-  const ready = missing.length === 0;
+  const { answers, steps, missing, warnings, onEdit, price, paying, payError, purchase, slug, onPay } = props;
+  const blocked = warnings.some((w) => w.level === "block");
+  const ready = missing.length === 0 && !blocked;
   return (
     <div className="animate-rise">
       <h1 className="font-serif text-[30px] leading-tight font-medium tracking-tight sm:text-[34px]">Review and download</h1>
       <p className="mt-2 text-[15px] text-ink-soft">Check your answers against the preview. You can still change anything.</p>
 
-      {!ready && (
+      {warnings.length > 0 && (
+        <div className="mt-6">
+          <Warnings items={warnings} />
+        </div>
+      )}
+
+      {missing.length > 0 && (
         <div className="mt-6 rounded-xl border border-[#f3d9a4] bg-honey-soft p-4 text-sm">
           <p className="font-medium">A few answers are still missing:</p>
           <ul className="mt-2 space-y-1">
@@ -560,8 +579,8 @@ function Review(props: {
       </div>
 
       <p className="mt-5 text-xs leading-relaxed text-muted">
-        {SITE.name} provides self-help templates, not legal advice. Laws differ by state. For complex situations, consider
-        having an attorney review your document.
+        {SITE.name} provides self-help templates, not legal advice, and is not a substitute for the advice of an attorney. Laws differ by state.
+        For complex situations, have an attorney review your document.
       </p>
     </div>
   );

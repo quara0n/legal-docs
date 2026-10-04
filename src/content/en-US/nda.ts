@@ -209,6 +209,13 @@ export const nda: Template = {
       },
       {
         type: "clause",
+        title: "Whistleblower Protection",
+        paragraphs: [
+          "Nothing in this Agreement prevents anyone from reporting a possible violation of law to a government agency, or from making disclosures protected by whistleblower laws. Under the Defend Trade Secrets Act (18 U.S.C. § 1833(b)), an individual is not liable for disclosing a trade secret in confidence to a government official or an attorney solely to report or investigate a suspected violation of law, or in a complaint or other document filed under seal in a lawsuit or other proceeding.",
+        ],
+      },
+      {
+        type: "clause",
         title: "General",
         paragraphs: [
           `This Agreement is governed by the laws of the State of ${c.v("state", "state")}, without regard to its conflict of laws rules. This Agreement is the entire agreement between the parties about its subject matter and may only be changed in a writing signed by both parties. Neither party is obligated to enter into any further agreement or transaction. If any provision is found unenforceable, the remainder shall remain in effect. This Agreement may be signed in counterparts and by electronic signature, each of which is deemed an original.`,

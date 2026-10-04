@@ -102,3 +102,23 @@ describe.each(templates.map((t) => [t.slug, t] as const))("%s", (_slug, t) => {
     expect(bytes.length).toBeGreaterThan(5000);
   });
 });
+
+describe("state warnings", () => {
+  const poa = getTemplates().find((t) => t.slug === "general-power-of-attorney")!;
+
+  it("blocks the power of attorney in New York, which requires its own statutory form", () => {
+    expect(poa.warnings!({ state: "New York" }).some((w) => w.level === "block")).toBe(true);
+    expect(poa.warnings!({ state: "Ohio" }).some((w) => w.level === "block")).toBe(false);
+  });
+
+  it("never makes a Florida power of attorney springing", () => {
+    const text = JSON.stringify(poa.render(withDefaults(poa, { state: "Florida", durable: "yes", effective: "incapacity" })));
+    expect(text).toContain("effective immediately upon signing");
+  });
+
+  it("adds the lead-paint disclosure for older rentals", () => {
+    const lease = getTemplates().find((t) => t.slug === "residential-lease-agreement")!;
+    expect(JSON.stringify(lease.render(withDefaults(lease, { builtBefore1978: "yes" })))).toContain("Lead-Based Paint Disclosure");
+    expect(JSON.stringify(lease.render(withDefaults(lease, { builtBefore1978: "no" })))).not.toContain("Lead-Based Paint Disclosure");
+  });
+});

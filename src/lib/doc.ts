@@ -88,6 +88,14 @@ export interface Template {
   };
   steps: Step[];
   render: (a: Answers) => Block[];
+  // State-specific or situational cautions shown in the editor. "block" stops
+  // checkout, for cases where this template is the wrong tool.
+  warnings?: (a: Answers) => Warning[];
+}
+
+export interface Warning {
+  level: "info" | "block";
+  text: string;
 }
 
 // ---------------------------------------------------------------------------

@@ -12,7 +12,7 @@ Rough order; the first five get you live.
    Turn on email receipts, and verify the domain for Apple Pay.
 4. **Company details and support email.** Set `NEXT_PUBLIC_COMPANY_NAME`,
    `NEXT_PUBLIC_COMPANY_ADDRESS` and `NEXT_PUBLIC_SUPPORT_EMAIL` (and make sure the inbox works).
-5. **Lawyer review.** Have a US attorney review the 8 templates and the terms, privacy, refund
+5. **Lawyer review.** Send `LEGAL-REVIEW.md` (scope, open questions, reviewer options) to a US attorney to review the 8 templates and the terms, privacy, refund
    and disclaimer pages. Many offer a fixed fee for this. Change wording in `src/content/en-US/`
    and `src/app/{terms,privacy,refunds,disclaimer}/`.
 6. **Refund promise.** The site offers a 14-day no-questions refund. Keep it (it converts well)

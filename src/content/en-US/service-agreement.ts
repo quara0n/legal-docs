@@ -234,4 +234,18 @@ export const serviceAgreement: Template = {
     ];
     return blocks;
   },
+  warnings(a) {
+    const laws: Record<string, string> = {
+      California: "California's Freelance Worker Protection Act",
+      "New York": "New York's Freelance Isn't Free Act",
+      Illinois: "Illinois' Freelance Worker Protection Act",
+    };
+    if (!laws[a.state]) return [];
+    return [
+      {
+        level: "info" as const,
+        text: `${laws[a.state]} requires a written contract for most freelance work, listing the services, the pay and when it's due, and generally requires payment within 30 days of completion. This agreement covers those terms. Both sides should keep a signed copy.`,
+      },
+    ];
+  },
 };

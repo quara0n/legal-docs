@@ -1,4 +1,4 @@
-import { makeCtx, type Block, type Template } from "@/lib/doc";
+import { makeCtx, type Block, type Template, type Warning } from "@/lib/doc";
 
 const POWERS: Record<string, string> = {
   real: "Real property transactions (buying, selling, leasing and managing real estate)",
@@ -70,6 +70,7 @@ export const powerOfAttorney: Template = {
       fields: [
         { id: "pName", label: "Your full legal name", type: "text", required: true, placeholder: "Jane Smith" },
         { id: "pAddress", label: "Your address", type: "text", required: true, placeholder: "Street, city, state, ZIP" },
+        { id: "state", label: "State you live in", type: "region", required: true, help: "Powers of attorney follow the rules of your state." },
       ],
     },
     {
@@ -133,23 +134,17 @@ export const powerOfAttorney: Template = {
             { value: "now", label: "Immediately", description: "As soon as it is signed." },
             { value: "incapacity", label: "Only if I become incapacitated", description: "Confirmed in writing by a doctor." },
           ],
-          showIf: (a) => a.durable !== "no",
+          showIf: (a) => a.durable !== "no" && a.state !== "Florida",
         },
         { id: "endDate", label: "End date (optional)", type: "date", half: true, help: "Leave empty to keep it until revoked." },
-        {
-          id: "state",
-          label: "State you live in",
-          type: "region",
-          required: true,
-          half: true,
-        },
       ],
     },
   ],
   render(a) {
     const c = makeCtx(a);
     const durable = !c.is("durable", "no");
-    const springing = durable && c.is("effective", "incapacity");
+    // Florida does not allow powers of attorney that only start on incapacity.
+    const springing = durable && c.is("effective", "incapacity") && !c.is("state", "Florida");
     const chosen = c.multi("powers").filter((p) => POWERS[p]);
     const blocks: Block[] = [
       { type: "title", text: durable ? "Durable General Power of Attorney" : "General Power of Attorney" },
@@ -256,5 +251,47 @@ export const powerOfAttorney: Template = {
       },
     );
     return blocks;
+  },
+  warnings(a) {
+    const out: Warning[] = [];
+    switch (a.state) {
+      case "New York":
+        out.push({
+          level: "block",
+          text: "New York requires its own Statutory Short Form Power of Attorney, with exact wording set by law. This general template won't be accepted there. Use the official New York form (free from the NY courts website) or ask a New York attorney.",
+        });
+        break;
+      case "Florida":
+        out.push({
+          level: "info",
+          text: "Florida: the principal must sign in front of two witnesses and a notary, and the power of attorney takes effect immediately (Florida doesn't allow one that starts only on incapacity).",
+        });
+        break;
+      case "California":
+        out.push({
+          level: "info",
+          text: "California has its own Uniform Statutory Form Power of Attorney and requires the signature to be notarized or signed in front of two witnesses. Many California banks prefer the statutory form.",
+        });
+        break;
+      case "Pennsylvania":
+        out.push({
+          level: "info",
+          text: "Pennsylvania requires a specific notice signed by the principal at the start of the document, two witnesses plus a notary, and a signed agent acknowledgment. Have a Pennsylvania attorney check the document before relying on it.",
+        });
+        break;
+      case "Texas":
+      case "Illinois":
+        out.push({
+          level: "info",
+          text: `${a.state} has an official statutory power of attorney form that banks and title companies recognize most easily. This document is valid if properly signed and notarized, but some institutions may ask for the statutory form.`,
+        });
+        break;
+    }
+    if (a.durable !== "no" && a.effective === "incapacity" && a.state !== "Florida")
+      out.push({
+        level: "info",
+        text: "A power of attorney that only starts on incapacity can cause delays: banks may ask for the doctor's written statement before accepting it.",
+      });
+    return out;
   },
 };

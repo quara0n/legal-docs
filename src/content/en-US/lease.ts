@@ -1,4 +1,4 @@
-import { makeCtx, type Block, type Template } from "@/lib/doc";
+import { makeCtx, type Block, type Template, type Warning } from "@/lib/doc";
 import { governingLawField, partyFields, partyIntro, sigParty } from "./shared";
 
 const ordinal = (n: string) => {
@@ -42,7 +42,7 @@ export const lease: Template = {
     faq: [
       {
         q: "Does this lease work in every state?",
-        a: "It covers the terms most states expect, but some states and cities add their own rules (for example deposit limits, required disclosures such as lead paint for pre-1978 homes, or rent control). Check your local requirements before signing.",
+        a: "It covers the terms most states expect and includes the federal lead-paint disclosure for pre-1978 homes. Some states and cities add their own rules, such as deposit limits, extra disclosures or rent control. The editor flags the common ones, but check your local requirements before signing.",
       },
       {
         q: "Should I choose fixed-term or month-to-month?",
@@ -107,6 +107,18 @@ export const lease: Template = {
           ],
         },
         { ...governingLawField, label: "State the property is in", help: undefined },
+        {
+          id: "builtBefore1978",
+          label: "Was the building built before 1978?",
+          type: "select",
+          defaultValue: "no",
+          help: "Federal law requires a lead-based paint disclosure for older homes.",
+          options: [
+            { value: "no", label: "No, 1978 or later" },
+            { value: "yes", label: "Yes, before 1978" },
+            { value: "unknown", label: "Not sure" },
+          ],
+        },
       ],
     },
     {
@@ -287,6 +299,13 @@ export const lease: Template = {
       },
       {
         type: "clause",
+        title: "Required Disclosures",
+        paragraphs: [
+          `${c.is("builtBefore1978", "no") ? "" : "The Property was or may have been built before 1978. Before signing, the Landlord has given the Tenant the EPA pamphlet “Protect Your Family From Lead in Your Home” and a completed Lead-Based Paint Disclosure form, which is signed by both parties and attached to this Lease. "}The Landlord shall also provide any other disclosures required by federal, state or local law (for example about mold, flood zones, smoke and carbon monoxide detectors, or the name and address of the property manager). Any such disclosures are attached to and form part of this Lease.`,
+        ],
+      },
+      {
+        type: "clause",
         title: "Default",
         paragraphs: [
           "If the Tenant fails to pay rent when due or materially breaches this Lease, the Landlord may end the tenancy and pursue any remedies available under applicable law, after giving any notice the law requires.",
@@ -313,6 +332,27 @@ export const lease: Template = {
       },
     );
     return blocks;
+  },
+  warnings(a) {
+    const out: Warning[] = [];
+    if (a.builtBefore1978 && a.builtBefore1978 !== "no")
+      out.push({
+        level: "info",
+        text: "Homes built before 1978 need the federal Lead-Based Paint Disclosure form and the EPA lead pamphlet, given to the tenant before signing. Both are free at epa.gov/lead. Attach the signed form to this lease.",
+      });
+    const rent = Number((a.rent ?? "").replace(/[^0-9.]/g, ""));
+    const deposit = Number((a.deposit ?? "").replace(/[^0-9.]/g, ""));
+    if (a.state === "California" && rent && deposit > rent)
+      out.push({
+        level: "info",
+        text: "California generally limits security deposits to one month's rent (some small landlords may charge up to two). Check the current rule before collecting more.",
+      });
+    if (a.state === "New York" || a.state === "California" || a.state === "Oregon" || a.state === "District of Columbia")
+      out.push({
+        level: "info",
+        text: `${a.state} has rent regulation and extra tenant protections in many areas. If the unit is rent-stabilized or rent-controlled, special lease forms and riders may be required.`,
+      });
+    return out;
   },
 };
 

@@ -41,7 +41,7 @@ export function SiteFooter() {
       <div className="border-t border-line">
         <p className="mx-auto max-w-6xl px-4 py-5 text-xs leading-relaxed text-muted sm:px-6">
           {SITE.name} is not a law firm and does not provide legal advice. Our templates are general documents that
-          you complete yourself. For advice about your specific situation, talk to a licensed attorney in your state.
+          you complete yourself, and they are not a substitute for the advice of an attorney. For advice about your situation, talk to a licensed attorney in your state.
         </p>
       </div>
     </footer>
