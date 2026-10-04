@@ -4,8 +4,9 @@ The app is built, tested and ready to deploy. It launches in **Norway first**: N
 site, seven Norwegian templates, prices in NOK (99–199 kr). These are the steps only the owner
 can do. Rough order; the first five get you live.
 
-1. **Pick the name and domain.** "Fairform" is a placeholder. Buy the domain, then set
-   `NEXT_PUBLIC_SITE_NAME` and `NEXT_PUBLIC_SITE_URL`.
+1. **Buy the domain.** The name is **Rettfram** (already set in the code). Check that rettfram.no is
+   free and search the name at search.patentstyret.no, buy the domain with your ENK's org number,
+   then set `NEXT_PUBLIC_SITE_URL` (e.g. `https://rettfram.no`).
 2. **Deploy on Vercel.** vercel.com/new → import `quara0n/legal-docs` → add the variables from
    `.env.example` → Deploy. Add the domain under Settings → Domains. `NEXT_PUBLIC_MARKET` can stay
    unset (Norway is the default).

@@ -6,7 +6,7 @@ import { SITE } from "./site";
 // Everything the visitor types stays in their own browser. Nothing is stored
 // on our servers: the PDF is generated on request and not kept.
 
-const PREFIX = "fairform";
+const PREFIX = "rettfram";
 
 function read<T>(key: string): T | null {
   try {

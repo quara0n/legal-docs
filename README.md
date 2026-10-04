@@ -1,10 +1,10 @@
-# Fairform: legal documents at one honest price
+# Rettfram: legal documents at one honest price
 
 A guided document builder for simple legal documents. Visitors answer one short question
 at a time, watch the document write itself in a live preview, and pay once per document only
 when they download the PDF. No subscription, no account.
 
-"Fairform" is a placeholder name: set `NEXT_PUBLIC_SITE_NAME` to change it.
+The brand is **Rettfram** (rettfram.no). `NEXT_PUBLIC_SITE_NAME` overrides it, for example for a US deployment.
 
 ## Markets
 
