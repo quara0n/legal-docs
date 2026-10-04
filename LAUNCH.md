@@ -16,7 +16,8 @@ Rough order; the first five get you live.
    The site limits the risk: buyers must tick "not a law firm, not legal advice" before paying,
    every PDF ends with a not-legal-advice note, the terms cap liability at the price paid, and the
    editor warns or blocks where a state needs something different. If you ever get complaints
-   about one document, pull it or get just that one reviewed.
+   about one document, pull it or get just that one reviewed. The full list of what keeps you
+   covered (company, insurance, privacy, cookies, tax, ads, trademark) is in `LEGAL-CHECKLIST.md`.
 6. **Refund promise.** The site offers a 14-day no-questions refund. Keep it (it converts well)
    or change `refundDays` in `src/lib/site.ts`.
 7. **Analytics (optional).** Create a Plausible site and set `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`.
