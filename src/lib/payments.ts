@@ -5,7 +5,8 @@ import { SITE } from "./site";
 // Stripe Checkout, one-time payments only. Without STRIPE_SECRET_KEY the app
 // runs in demo mode: checkout skips straight to the download page.
 
-const key = process.env.STRIPE_SECRET_KEY;
+// Trimmed: a key pasted with a trailing newline makes every Stripe call fail.
+const key = process.env.STRIPE_SECRET_KEY?.trim();
 export const stripe = key ? new Stripe(key) : null;
 // Never on the live site: without a key there, checkout just reports that
 // payments aren't set up, instead of handing out free documents.

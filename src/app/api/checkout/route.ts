@@ -23,33 +23,45 @@ export async function POST(request: Request) {
   const vipps = vippsEnabled && template.locale === "nb-NO";
 
   // Answers never leave the browser for checkout. Stripe only sees the product.
-  const session = await stripe.checkout.sessions.create(
-    {
-      mode: "payment",
-      ...(vipps ? { payment_method_types: ["card", "vipps"] } : {}),
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: getLocale(template.locale).currency,
-            unit_amount: template.price,
-            product_data: {
-              name: template.name,
-              description: t.api.productDescription,
+  let session: Stripe.Checkout.Session;
+  try {
+    session = await stripe.checkout.sessions.create(
+      {
+        mode: "payment",
+        // New Stripe accounts can default to Managed Payments (Stripe as merchant
+        // of record), which rejects custom_text. The ENK is the seller here.
+        managed_payments: { enabled: false },
+        ...(vipps ? { payment_method_types: ["card", "vipps"] } : {}),
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: getLocale(template.locale).currency,
+              unit_amount: template.price,
+              product_data: {
+                name: template.name,
+                description: t.api.productDescription,
+              },
             },
           },
+        ],
+        metadata: { slug: template.slug },
+        success_url: `${done}?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/create/${template.slug}?step=review`,
+        allow_promotion_codes: true,
+        locale: LANG === "nb-NO" ? "nb" : "en",
+        custom_text: {
+          submit: { message: t.api.checkoutNote },
         },
-      ],
-      metadata: { slug: template.slug },
-      success_url: `${done}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/create/${template.slug}?step=review`,
-      allow_promotion_codes: true,
-      locale: LANG === "nb-NO" ? "nb" : "en",
-      custom_text: {
-        submit: { message: t.api.checkoutNote },
       },
-    },
-    vipps ? { apiVersion: `${Stripe.API_VERSION}; vipps_preview=v1` } : undefined,
-  );
+      vipps ? { apiVersion: `${Stripe.API_VERSION}; vipps_preview=v1` } : undefined,
+    );
+  } catch (err) {
+    // Details go to the server log. The buyer gets a plain message plus Stripe's
+    // error code, so a setup problem is easy to spot.
+    console.error("Stripe checkout failed", err);
+    const code = err instanceof Stripe.errors.StripeError ? (err.code ?? err.type) : undefined;
+    return Response.json({ error: `${t.wizard.checkoutUnavailable}${code ? ` (${code})` : ""}` }, { status: 502 });
+  }
   return Response.json({ url: session.url });
 }

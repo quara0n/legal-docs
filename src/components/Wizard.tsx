@@ -132,7 +132,7 @@ export function Wizard({ slug }: { slug: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.url) throw new Error(data.error ?? t.wizard.checkoutUnavailable);
       window.location.href = data.url;
     } catch (e) {
