@@ -12,10 +12,11 @@ export async function POST(request: Request) {
   const origin = request.headers.get("origin") ?? new URL(request.url).origin;
   const done = `${origin}/create/${template.slug}/download`;
 
-  if (demoMode || !stripe) {
+  if (demoMode) {
     const id = `demo__${template.slug}__${Date.now()}`;
     return Response.json({ url: `${done}?session_id=${encodeURIComponent(id)}`, demo: true });
   }
+  if (!stripe) return Response.json({ error: t.api.notConfigured }, { status: 503 });
 
   // Vipps needs explicit payment method types and the preview header. Card
   // covers Apple Pay and Google Pay.

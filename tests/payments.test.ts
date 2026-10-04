@@ -3,7 +3,7 @@ import { demoMode, verifyPurchase } from "@/lib/payments";
 
 describe("purchase verification (demo mode)", () => {
   it("runs in demo mode without a Stripe key", () => {
-    expect(demoMode).toBe(!process.env.STRIPE_SECRET_KEY);
+    expect(demoMode).toBe(!process.env.STRIPE_SECRET_KEY && process.env.VERCEL_ENV !== "production");
   });
 
   it("accepts a demo purchase for the right document only", async () => {
