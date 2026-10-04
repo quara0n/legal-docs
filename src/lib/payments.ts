@@ -9,6 +9,10 @@ const key = process.env.STRIPE_SECRET_KEY;
 export const stripe = key ? new Stripe(key) : null;
 export const demoMode = !stripe;
 
+// Vipps runs through Stripe (Norway, NOK). It is in Stripe private preview, so it
+// stays off until Stripe has approved the account and NEXT_PUBLIC_VIPPS=1 is set.
+export const vippsEnabled = process.env.NEXT_PUBLIC_VIPPS === "1";
+
 export type Verification = { ok: true; slug: string; createdAt: number } | { ok: false; reason: string };
 
 export async function verifyPurchase(sessionId: string, slug: string): Promise<Verification> {

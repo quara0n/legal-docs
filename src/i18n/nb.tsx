@@ -259,7 +259,7 @@ export const nb: Dict = {
     ),
     opening: "Åpner sikker betaling…",
     pay: (price: string) => `Betal ${price} og last ned`,
-    secure: "Sikker betaling med Stripe. Kort, Apple Pay og Google Pay.",
+    secure: process.env.NEXT_PUBLIC_VIPPS === "1" ? "Sikker betaling med Stripe. Vipps, kort, Apple Pay og Google Pay." : "Sikker betaling med Stripe. Kort, Apple Pay og Google Pay.",
     yourAnswers: "Svarene dine",
     notAnswered: "Ikke besvart ennå",
     edit: "Endre",

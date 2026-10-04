@@ -13,9 +13,11 @@ can do. Rough order; the first five get you live.
 3. **Stripe.** Create an account for your ENK (country Norway, payouts in NOK), finish business verification, paste the secret key into
    `STRIPE_SECRET_KEY` (test key first, try card 4242 4242 4242 4242, then the live key).
    Turn on email receipts, and verify the domain for Apple Pay.
-4. **Company details and support email.** Set `NEXT_PUBLIC_COMPANY_NAME` (your ENK),
-   `NEXT_PUBLIC_COMPANY_ADDRESS`, `NEXT_PUBLIC_COMPANY_ID` (org.nr.) and `NEXT_PUBLIC_SUPPORT_EMAIL`
-   (and make sure the inbox works). Ehandelsloven requires these to be visible.
+   **Vipps:** Stripe offers Vipps for Norwegian accounts, but it is in private preview. Request
+   access at docs.stripe.com/payments/vipps (or ask Stripe support), turn Vipps on under
+   Settings → Payment methods once approved, then set `NEXT_PUBLIC_VIPPS=1` and redeploy.
+4. **Company details and support email.** Already set in `src/lib/site.ts` (Rune Finne, org.nr.
+   915 553 346, support hei@rettfram.no). Create the hei@rettfram.no inbox when you buy the domain.
 5. **Legal risk (no lawyer review).** The templates had an AI pre-review only, not an attorney's.
    The site limits the risk: buyers must tick "not a law firm, not legal advice" before paying,
    every PDF ends with a not-legal-advice note, the terms cap liability at the price paid, and the
