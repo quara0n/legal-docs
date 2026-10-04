@@ -30,8 +30,10 @@ export function SiteFooter() {
           <h3 className="text-sm font-semibold">{SITE.name}</h3>
           <ul className="mt-3 space-y-2 text-sm text-ink-soft">
             <li><Link href="/#pricing" className="hover:text-ink">Pricing</Link></li>
-            <li><Link href="/legal" className="hover:text-ink">Terms &amp; privacy</Link></li>
-            <li><Link href="/legal#disclaimer" className="hover:text-ink">Not legal advice</Link></li>
+            <li><Link href="/terms" className="hover:text-ink">Terms of service</Link></li>
+            <li><Link href="/privacy" className="hover:text-ink">Privacy policy</Link></li>
+            <li><Link href="/refunds" className="hover:text-ink">Refund policy</Link></li>
+            <li><Link href="/disclaimer" className="hover:text-ink">Not legal advice</Link></li>
             <li><a href={`mailto:${SITE.supportEmail}`} className="hover:text-ink">Contact</a></li>
           </ul>
         </div>

@@ -7,6 +7,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE.url, changeFrequency: "weekly", priority: 1 },
     { url: `${SITE.url}/documents`, changeFrequency: "weekly", priority: 0.8 },
     ...getTemplates().map((t) => ({ url: `${SITE.url}/documents/${t.slug}`, changeFrequency: "monthly" as const, priority: 0.9 })),
-    { url: `${SITE.url}/legal`, changeFrequency: "yearly", priority: 0.2 },
+    ...["terms", "privacy", "refunds", "disclaimer"].map((p) => ({ url: `${SITE.url}/${p}`, changeFrequency: "yearly" as const, priority: 0.2 })),
   ];
 }

@@ -14,7 +14,7 @@ const sampleFor = (f: Field, regions: string[]): string => {
     case "email":
       return "jane@example.com";
     case "textarea":
-      return "First line\nSecond line";
+      return f.placeholder ?? "First line\nSecond line";
     case "region":
       return regions[0];
     case "choice":

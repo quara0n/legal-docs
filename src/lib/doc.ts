@@ -77,7 +77,7 @@ export interface Template {
   category: "Business" | "Real estate" | "Personal";
   price: number; // minor units (cents / øre)
   minutes: number; // typical time to complete
-  icon: "shield" | "home" | "receipt" | "briefcase" | "key";
+  icon: "shield" | "home" | "receipt" | "briefcase" | "key" | "cash" | "users";
   seo: {
     title: string;
     description: string;

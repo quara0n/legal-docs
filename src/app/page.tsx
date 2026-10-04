@@ -33,7 +33,7 @@ const FAQ = [
   },
   {
     q: "What if I'm not happy?",
-    a: `Email ${SITE.supportEmail} within 14 days and we'll refund you. No forms, no questions.`,
+    a: `Email ${SITE.supportEmail} within ${SITE.refundDays} days and we'll refund you. No forms, no questions.`,
   },
 ];
 
@@ -114,7 +114,7 @@ export default function Home() {
               [
                 { icon: "lock", title: "Private by design", text: "Answers stay in your browser" },
                 { icon: "shield", title: "Secure checkout", text: "Payments handled by Stripe" },
-                { icon: "refresh", title: "14-day refund", text: "No forms, no questions" },
+                { icon: "refresh", title: `${SITE.refundDays}-day refund`, text: "No forms, no questions" },
                 { icon: "file", title: "Yours forever", text: "Clean PDF, no watermark" },
               ] as { icon: IconName; title: string; text: string }[]
             ).map((x) => (

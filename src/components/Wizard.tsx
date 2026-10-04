@@ -497,7 +497,7 @@ function Review(props: {
                 "Print-ready PDF, no watermark, no branding",
                 `Free edits and re-downloads for ${SITE.editDays} days`,
                 "No subscription, nothing renews, no account needed",
-                "Not happy? Full refund within 14 days, just email us",
+                `Not happy? Full refund within ${SITE.refundDays} days, just email us`,
               ].map((t) => (
                 <li key={t} className="flex gap-2">
                   <Icon name="check" className="mt-0.5 size-4 shrink-0 text-brand" strokeWidth={2.4} />
