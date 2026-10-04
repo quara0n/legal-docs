@@ -10,7 +10,7 @@ export const SITE = {
   company: process.env.NEXT_PUBLIC_COMPANY_NAME ?? "Rune Finne",
   // Organisasjonsnummer (Norway) or similar registration number, shown in the terms and footer.
   companyId: process.env.NEXT_PUBLIC_COMPANY_ID ?? "915553346",
-  companyAddress: process.env.NEXT_PUBLIC_COMPANY_ADDRESS ?? "Haugane 12",
+  companyAddress: process.env.NEXT_PUBLIC_COMPANY_ADDRESS ?? "Aksdal Senter, Raglamyrvegen 20, 5536 Haugesund",
   legalUpdated: formatDate("2026-10-04", LANG),
   editDays: 30, // free edits and re-downloads after purchase
   refundDays: 14,
