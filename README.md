@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fairform: legal documents at one honest price
 
-## Getting Started
+A guided document builder for simple legal documents (NDA, residential lease, bill of sale,
+freelance service agreement, general power of attorney). Visitors answer one short question
+at a time, watch the document write itself in a live preview, and pay once per document only
+when they download the PDF. No subscription, no account.
 
-First, run the development server:
+"Fairform" is a placeholder name: change it in `src/lib/site.ts`.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # optional: add a Stripe test key
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Without `STRIPE_SECRET_KEY` the app runs in **demo mode**: the pay button skips checkout and
+goes straight to the download page, so every flow can be tried locally.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Turning on payments
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a Stripe account and copy the test secret key into `.env.local` as `STRIPE_SECRET_KEY`.
+2. Pay with card `4242 4242 4242 4242`, any future date, any CVC.
+3. For production, use the live key and set `NEXT_PUBLIC_SITE_URL`.
 
-## Learn More
+Checkout is a one-time Stripe Checkout session built from the template's price (no Stripe
+products to set up). The download API re-checks the session with Stripe (paid, right
+document, within the 30-day free-edit window) before it generates a PDF.
 
-To learn more about Next.js, take a look at the following resources:
+## How it fits together
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Path | What it is |
+| --- | --- |
+| `src/content/en-US/*.ts` | The templates: questions (steps and fields), SEO copy, and a `render()` that turns answers into document blocks |
+| `src/content/index.ts` | Template registry per locale (currency, regions, templates) |
+| `src/lib/doc.ts` | Shared types and helpers. Answers are wrapped in tokens so the preview can highlight them |
+| `src/lib/pdf.ts` | Renders the same blocks to a US Letter PDF with pdf-lib (page numbers, signature lines, notary block) |
+| `src/components/Wizard.tsx` | The one-question-at-a-time editor with live preview, autosave, review and checkout |
+| `src/app/api/checkout` | Creates the Stripe Checkout session (or a demo session) |
+| `src/app/api/download` | Verifies the purchase and returns the PDF |
+| `src/app/documents/[slug]` | SEO landing page per template, with FAQ and Product structured data |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Answers live only in the visitor's browser (localStorage). They are sent to the server once,
+at download, to build the PDF, and are not stored.
 
-## Deploy on Vercel
+## Adding a template
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Copy one of the files in `src/content/en-US/`, change the steps and `render()`, and add it to
+`src/content/index.ts`. Field types: text, textarea, date, choice (cards), select, multi
+(checkboxes), money, number, region, email. Steps and fields can be conditional with `showIf`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To preview every template as a PDF with sample answers: `npx tsx scripts/sample-pdfs.ts`
+(writes to `./out`).
+
+## Adding a language or country (e.g. Norway)
+
+Create `src/content/nb-NO/` with its own templates (for example a husleiekontrakt), register
+the locale in `src/content/index.ts` with `currency: "nok"` and the list of fylker as
+`regions`. The page routes currently serve the default locale; add a `[locale]` segment or a
+separate domain when the second locale is ready.
+
+## Before launch
+
+- Have a licensed attorney review the template wording.
+- Replace the placeholder terms/privacy page (`src/app/legal`) and support email (`src/lib/site.ts`).
+- Decide whether to keep the 14-day refund promise shown on the site.
