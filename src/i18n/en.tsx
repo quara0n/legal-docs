@@ -357,7 +357,7 @@ export const en = {
   },
 
   cookies: {
-    text: "We'd like to use cookies from Google to measure which ads bring visitors. Your document answers are never shared.",
+    text: "We'd like to use cookies from Google and Microsoft for visitor statistics and to measure which ads work. Your document answers are never shared.",
     accept: "Accept",
     reject: "Decline",
     more: "Privacy",

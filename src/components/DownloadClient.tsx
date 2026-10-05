@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getTemplate } from "@/content";
 import { withDefaults, type Answers } from "@/lib/doc";
 import { t } from "@/i18n";
-import { trackConversion } from "@/lib/ads";
+import { trackPurchase } from "@/lib/tracking";
 import { track } from "@/lib/analytics";
 import { CURRENCY } from "@/lib/market";
 import { loadDraft, loadPurchase, savePurchase } from "@/lib/storage";
@@ -54,7 +54,7 @@ export function DownloadClient({ slug }: { slug: string }) {
     }
     if (!loadPurchase(slug)) {
       track("Purchase completed", { document: slug });
-      trackConversion(template.price / 100, CURRENCY.toUpperCase(), sessionId);
+      trackPurchase({ slug, name: template.name }, template.price / 100, CURRENCY.toUpperCase(), sessionId);
     }
     savePurchase(slug, sessionId);
     const draft = loadDraft(slug);
@@ -69,7 +69,7 @@ export function DownloadClient({ slug }: { slug: string }) {
   /* eslint-enable react-hooks/set-state-in-effect */
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+    <main data-clarity-mask="True" className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
       <div className="grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:items-start">
         <div>
           {state.kind === "error" ? (

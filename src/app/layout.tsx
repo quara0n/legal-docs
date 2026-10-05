@@ -3,7 +3,7 @@ import { Inter, Newsreader } from "next/font/google";
 import Script from "next/script";
 import { CookieBanner } from "@/components/CookieBanner";
 import { t } from "@/i18n";
-import { ADS_ID, consentBootstrap } from "@/lib/ads";
+import { GTAG_ID, TRACKING_ON, consentBootstrap } from "@/lib/tracking";
 import { HTML_LANG } from "@/lib/market";
 import { SITE } from "@/lib/site";
 import "./globals.css";
@@ -39,16 +39,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         {children}
-        {ADS_ID && (
+        {GTAG_ID && (
           <>
             {/* Consent Mode v2: everything denied until the visitor accepts. */}
             <Script id="consent-default" strategy="beforeInteractive">
-              {consentBootstrap(ADS_ID)}
+              {consentBootstrap()}
             </Script>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`} strategy="afterInteractive" />
-            <CookieBanner />
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`} strategy="afterInteractive" />
           </>
         )}
+        {TRACKING_ON && <CookieBanner />}
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <Script
             defer

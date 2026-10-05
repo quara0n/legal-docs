@@ -358,7 +358,7 @@ export const nb: Dict = {
   },
 
   cookies: {
-    text: "Vi vil gjerne bruke informasjonskapsler fra Google for å måle hvilke annonser som gir besøk. Svarene i dokumentet ditt deles aldri.",
+    text: "Vi vil gjerne bruke informasjonskapsler fra Google og Microsoft til besøksstatistikk og til å måle hvilke annonser som virker. Svarene i dokumentet ditt deles aldri.",
     accept: "Godta",
     reject: "Avvis",
     more: "Personvern",

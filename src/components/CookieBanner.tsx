@@ -3,16 +3,18 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { t } from "@/i18n";
-import { ADS_ID, CONSENT_OPEN_EVENT, loadConsent, saveConsent, type Consent } from "@/lib/ads";
+import { CONSENT_OPEN_EVENT, TRACKING_ON, loadClarity, loadConsent, saveConsent, type Consent } from "@/lib/tracking";
 
-// Shown only when Google Ads is configured. Declining is as easy as accepting.
+// Shown only when GA4, Google Ads or Clarity is configured. Declining is as easy as accepting.
 export function CookieBanner() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!ADS_ID) return;
+    if (!TRACKING_ON) return;
+    const saved = loadConsent();
+    if (saved === "granted") loadClarity();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- storage is only readable after mount
-    if (!loadConsent()) setOpen(true);
+    if (!saved) setOpen(true);
     const reopen = () => setOpen(true);
     window.addEventListener(CONSENT_OPEN_EVENT, reopen);
     return () => window.removeEventListener(CONSENT_OPEN_EVENT, reopen);
@@ -45,7 +47,7 @@ export function CookieBanner() {
 }
 
 export function CookieSettingsButton() {
-  if (!ADS_ID) return null;
+  if (!TRACKING_ON) return null;
   return (
     <button onClick={() => window.dispatchEvent(new Event(CONSENT_OPEN_EVENT))} className="font-medium text-brand underline">
       {t.cookies.change}

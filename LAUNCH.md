@@ -17,7 +17,7 @@ can do. Rough order; the first five get you live.
    access at docs.stripe.com/payments/vipps (or ask Stripe support), turn Vipps on under
    Settings → Payment methods once approved, then set `NEXT_PUBLIC_VIPPS=1` and redeploy.
 4. **Company details and support email.** Already set in `src/lib/site.ts` (Rune Finne, org.nr.
-   915 553 346, support hei@rettframavtaler.no). Create the hei@rettframavtaler.no inbox when you buy the domain.
+   915 553 346, support kundeservice@rettframavtaler.no). Create the kundeservice@rettframavtaler.no inbox when you buy the domain.
 5. **Legal risk (no lawyer review).** The templates had an AI pre-review only, not an attorney's.
    The site limits the risk: buyers must tick "not a law firm, not legal advice" before paying,
    every PDF ends with a not-legal-advice note, the terms cap liability at the price paid, and the

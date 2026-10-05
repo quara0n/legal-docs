@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/LegalPage";
 import { CookieSettingsButton } from "@/components/CookieBanner";
-import { ADS_ID } from "@/lib/ads";
+import { TRACKING_ON } from "@/lib/tracking";
 import { SITE } from "@/lib/site";
 
 export function PrivacyNO() {
@@ -47,14 +47,15 @@ export function PrivacyNO() {
         Nettleserens lokale lagring brukes til utkastet ditt og kjøpsreferansen, som er nødvendig for at tjenesten skal virke.
         Betalingssiden til Stripe kan sette egne nødvendige informasjonskapsler.
       </p>
-      {ADS_ID ? (
+      {TRACKING_ON ? (
         <>
           <p>
-            Vi annonserer på Google. Bare hvis du godtar det i banneret, setter Google informasjonskapsler som måler om et besøk
-            kom fra en annonse og endte med et kjøp. Avviser du, settes ingen slike informasjonskapsler, og Google får bare
-            anonyme signaler uten informasjonskapsler (Consent Mode). Svarene i dokumentet ditt sendes aldri til Google.
-            Grunnlaget er samtykket ditt (personvernforordningen artikkel 6 nr. 1 bokstav a), og du kan trekke det tilbake
-            når som helst.
+            Bare hvis du godtar det i banneret, bruker vi Google Analytics og Microsoft Clarity til besøksstatistikk og til å se
+            hvordan nettstedet brukes, og Google Ads til å måle om et besøk kom fra en annonse og endte med et kjøp. Disse
+            setter informasjonskapsler. Avviser du, lastes ikke Clarity, og Google får bare anonyme signaler uten
+            informasjonskapsler (Consent Mode). Skjemaet og dokumentet ditt er skjult for Clarity, og svarene dine sendes aldri
+            til Google eller Microsoft. Grunnlaget er samtykket ditt (personvernforordningen artikkel 6 nr. 1 bokstav a), og du
+            kan trekke det tilbake når som helst.
           </p>
           <p>
             <CookieSettingsButton />
@@ -69,7 +70,7 @@ export function PrivacyNO() {
         <li>Stripe (betaling)</li>
         <li>Vercel (drift av nettstedet)</li>
         <li>Plausible (anonym statistikk, hvis slått på)</li>
-        {ADS_ID && <li>Google (annonsemåling, bare hvis du har samtykket)</li>}
+        {TRACKING_ON && <li>Google og Microsoft (statistikk og annonsemåling, bare hvis du har samtykket)</li>}
         <li>Leverandøren av e-posten vår, når du skriver til oss</li>
       </ul>
       <p>

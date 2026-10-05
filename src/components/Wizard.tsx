@@ -175,7 +175,7 @@ export function Wizard({ slug }: { slug: string }) {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f7f5f0] lg:h-screen lg:overflow-hidden">
+    <div data-clarity-mask="True" className="flex min-h-screen flex-col bg-[#f7f5f0] lg:h-screen lg:overflow-hidden">
       {/* Top bar */}
       <header className="z-20 shrink-0 border-b border-line bg-paper/90 backdrop-blur">
         <div className="flex h-14 items-center gap-3 px-4 sm:px-6">
