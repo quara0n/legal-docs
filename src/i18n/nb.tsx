@@ -34,6 +34,7 @@ export const nb: Dict = {
     blurb: "Enkle juridiske dokumenter til én ærlig pris. Betal én gang per dokument og behold det for alltid. Ingen abonnement, ingen konto, ingen overraskelser.",
     documents: "Dokumenter",
     pricing: "Priser",
+    guides: "Guider",
     terms: "Vilkår",
     privacy: "Personvern",
     refunds: "Angrerett og refusjon",
