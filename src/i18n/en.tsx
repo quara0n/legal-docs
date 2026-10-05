@@ -33,6 +33,7 @@ export const en = {
     blurb: "Simple legal documents at one honest price. Pay once per document, keep it forever. No subscription, no account, no surprises.",
     documents: "Documents",
     pricing: "Pricing",
+    guides: "Guides",
     terms: "Terms of service",
     privacy: "Privacy policy",
     refunds: "Refund policy",

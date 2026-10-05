@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTemplate, getTemplates } from "@/content";
+import { getGuideForTemplate } from "@/content/guides";
 import { DocPreview } from "@/components/DocPreview";
 import { Icon } from "@/components/Icon";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -34,6 +35,7 @@ export default async function TemplatePage(props: PageProps<"/documents/[slug]">
   if (!t) notFound();
   const others = getTemplates().filter((o) => o.slug !== t.slug).slice(0, 3);
   const price = formatPrice(t.price, LANG);
+  const guide = getGuideForTemplate(t.slug);
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -70,6 +72,13 @@ export default async function TemplatePage(props: PageProps<"/documents/[slug]">
             </nav>
             <h1 className="mt-4 font-serif text-[40px] leading-[1.08] font-medium tracking-tight sm:text-5xl">{tr.doc.h1(t.name)}</h1>
             <p className="mt-5 text-lg leading-relaxed text-ink-soft">{t.seo.intro}</p>
+            {guide && (
+              <p className="mt-4 text-sm">
+                <Link href={`/guide/${guide.slug}`} className="inline-flex items-center gap-1 font-medium text-brand hover:underline">
+                  Les guiden: {guide.linkText} <Icon name="arrowRight" className="size-4" />
+                </Link>
+              </p>
+            )}
 
             <div className="mt-8 rounded-2xl border border-line bg-white p-6">
               <div className="flex flex-wrap items-center justify-between gap-4">
