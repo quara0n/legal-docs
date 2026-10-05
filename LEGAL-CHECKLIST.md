@@ -121,7 +121,11 @@ GDPR applies through personopplysningsloven. The regulator is Datatilsynet.
 
 ## 6. Cookies and the Google Ads tag
 
-- ✅ Right now **no cookie banner is needed**.
+- ✅ **Consent banner is built in.** It appears only when `NEXT_PUBLIC_GOOGLE_ADS_ID` is set.
+  - Google Consent Mode v2 keeps every Google cookie denied until the visitor clicks «Godta».
+  - «Avvis» is just as prominent as «Godta», and the privacy page has a button to change the choice.
+  - The privacy page's cookie section and the list of processors update automatically.
+- ✅ Without the Google Ads ID set, **no cookie banner is needed**.
   - The site sets no tracking cookies.
   - Saving the customer's own draft in their browser is part of the service they asked for.
 - ☐ **When you add Google Ads conversion tracking or remarketing, you need a consent banner

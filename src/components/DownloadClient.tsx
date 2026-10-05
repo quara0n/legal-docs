@@ -6,7 +6,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getTemplate } from "@/content";
 import { withDefaults, type Answers } from "@/lib/doc";
 import { t } from "@/i18n";
+import { trackConversion } from "@/lib/ads";
 import { track } from "@/lib/analytics";
+import { CURRENCY } from "@/lib/market";
 import { loadDraft, loadPurchase, savePurchase } from "@/lib/storage";
 import { DocPreview } from "./DocPreview";
 import { Icon } from "./Icon";
@@ -50,7 +52,10 @@ export function DownloadClient({ slug }: { slug: string }) {
       setState({ kind: "error", message: t.download.missingRef });
       return;
     }
-    if (!loadPurchase(slug)) track("Purchase completed", { document: slug });
+    if (!loadPurchase(slug)) {
+      track("Purchase completed", { document: slug });
+      trackConversion(template.price / 100, CURRENCY.toUpperCase(), sessionId);
+    }
     savePurchase(slug, sessionId);
     const draft = loadDraft(slug);
     if (!draft) {

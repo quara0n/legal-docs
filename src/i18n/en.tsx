@@ -355,6 +355,14 @@ export const en = {
     page: (i: number, n: number) => `Page ${i} of ${n}`,
     initials: "Initials: ______",
   },
+
+  cookies: {
+    text: "We'd like to use cookies from Google to measure which ads bring visitors. Your document answers are never shared.",
+    accept: "Accept",
+    reject: "Decline",
+    more: "Privacy",
+    change: "Change cookie choice",
+  },
 };
 
 export type Dict = typeof en;

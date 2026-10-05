@@ -356,4 +356,12 @@ export const nb: Dict = {
     page: (i: number, n: number) => `Side ${i} av ${n}`,
     initials: "Parafering: ______",
   },
+
+  cookies: {
+    text: "Vi vil gjerne bruke informasjonskapsler fra Google for å måle hvilke annonser som gir besøk. Svarene i dokumentet ditt deles aldri.",
+    accept: "Godta",
+    reject: "Avvis",
+    more: "Personvern",
+    change: "Endre valg for informasjonskapsler",
+  },
 };
