@@ -12,8 +12,17 @@ import { LANG } from "@/lib/market";
 import { HERO } from "@/lib/samples";
 import { SITE } from "@/lib/site";
 
+// Most-asked documents first. Matches the search campaign's keywords, not measured clicks.
+const FRONT_ORDER = ["kjopekontrakt", "husleiekontrakt", "gjeldsbrev", "fullmakt", "fremleiekontrakt", "taushetserklaering", "oppdragsavtale"];
+
 export default function Home() {
-  const templates = getTemplates();
+  const templates = [...getTemplates()].sort((a, b) => {
+    const rank = (slug: string) => {
+      const i = FRONT_ORDER.indexOf(slug);
+      return i === -1 ? FRONT_ORDER.length : i;
+    };
+    return rank(a.slug) - rank(b.slug);
+  });
   const hero = getTemplate(HERO.slug)!;
   const prices = templates.map((d) => d.price);
   const minPrice = formatPrice(Math.min(...prices), LANG);
@@ -52,7 +61,7 @@ export default function Home() {
             </div>
 
             {/* Product visual: a question card on top of the live document */}
-            <div className="relative mx-auto w-full max-w-[520px]" aria-hidden="true">
+            <div className="relative mx-auto hidden w-full max-w-[520px] sm:block" aria-hidden="true">
               <div className="relative h-[460px] overflow-hidden rounded-md bg-white px-9 py-10 shadow-[0_30px_70px_-30px_rgba(20,23,31,0.45)] ring-1 ring-ink/5 [mask-image:linear-gradient(to_bottom,black_70%,transparent)] sm:h-[520px]">
                 <DocPreview blocks={hero.render(HERO.answers)} active={HERO.active} watermark={false} small />
               </div>
@@ -74,7 +83,7 @@ export default function Home() {
 
         {/* Trust strip */}
         <section aria-label={t.home.trustLabel} className="border-t border-line bg-paper">
-          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-8 sm:px-6 md:grid-cols-4">
+          <div className="mx-auto flex max-w-6xl flex-wrap gap-x-6 gap-y-4 px-4 py-6 sm:px-6 md:grid md:grid-cols-4 md:gap-6 md:py-8">
             {(t.home.trust as { icon: IconName; title: string; text: string }[]).map((x) => (
               <div key={x.title} className="flex items-start gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-cream text-brand">
@@ -82,7 +91,7 @@ export default function Home() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold">{x.title}</p>
-                  <p className="text-[13px] text-muted">{x.text}</p>
+                  <p className="hidden text-[13px] text-muted md:block">{x.text}</p>
                 </div>
               </div>
             ))}
@@ -103,7 +112,7 @@ export default function Home() {
             </div>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {templates.map((d) => (
-                <TemplateCard key={d.slug} t={d} />
+                <TemplateCard key={d.slug} t={d} showCategory={false} />
               ))}
               <div className="flex flex-col justify-center rounded-2xl border border-dashed border-[#d7d2c5] p-6 text-sm text-ink-soft">
                 <p className="font-semibold text-ink">{t.home.moreTitle}</p>

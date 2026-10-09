@@ -27,18 +27,18 @@ export function CookieBanner() {
   };
 
   return (
-    <div role="dialog" aria-live="polite" aria-label={t.cookies.more} className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-xl rounded-2xl border border-line bg-white p-4 shadow-[0_20px_50px_-20px_rgba(20,23,31,0.45)] sm:p-5">
-      <p className="text-sm leading-relaxed text-ink-soft">
+    <div role="dialog" aria-live="polite" aria-label={t.cookies.more} className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-xl rounded-2xl border border-line bg-white p-3 shadow-[0_20px_50px_-20px_rgba(20,23,31,0.45)] sm:p-5">
+      <p className="text-[13px] leading-snug text-ink-soft sm:text-sm sm:leading-relaxed">
         {t.cookies.text}{" "}
         <Link href="/privacy" className="font-medium text-brand underline">
           {t.cookies.more}
         </Link>
       </p>
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <button onClick={() => choose("denied")} className="rounded-full border border-line px-4 py-2.5 text-sm font-semibold text-ink hover:bg-paper">
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4">
+        <button onClick={() => choose("denied")} className="rounded-full border border-line px-4 py-2 text-sm sm:py-2.5 font-semibold text-ink hover:bg-paper">
           {t.cookies.reject}
         </button>
-        <button onClick={() => choose("granted")} className="rounded-full border border-ink bg-ink px-4 py-2.5 text-sm font-semibold text-white hover:bg-black">
+        <button onClick={() => choose("granted")} className="rounded-full border border-ink bg-ink px-4 py-2 text-sm sm:py-2.5 font-semibold text-white hover:bg-black">
           {t.cookies.accept}
         </button>
       </div>

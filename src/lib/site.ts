@@ -3,7 +3,7 @@ import { formatDate } from "./doc";
 import { LANG, MARKET } from "./market";
 
 export const SITE = {
-  name: process.env.NEXT_PUBLIC_SITE_NAME ?? "Rettfram",
+  name: process.env.NEXT_PUBLIC_SITE_NAME ?? "Rettframavtaler",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://rettframavtaler.no").replace(/\/$/, ""),
   slogan: process.env.NEXT_PUBLIC_SITE_SLOGAN ?? (MARKET === "no" ? "Avtaler, rett fram." : ""),
   supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "kundeservice@rettframavtaler.no",
