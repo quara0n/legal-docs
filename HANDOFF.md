@@ -17,7 +17,7 @@ Rettfram er en norsk dokumentbygger («Avtaler, rett fram.»). 7 maler til 99–
 
 ## Gjenstår
 1. **Betalingskort i Google Ads** (Fakturering). Uten det vises ikke annonsene. Rune må sjekke.
-2. **Kjøpssporing i Google Ads:** Ads-ID er `AW-18502109574`, konverteringen «Kjøp» finnes. Hent konverteringsetiketten, sett `NEXT_PUBLIC_GOOGLE_ADS_ID` og `NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL` i Vercel og publiser på nytt.
+2. ~~Kjøpssporing i Google Ads~~ **Ferdig 9. okt.:** GA4 er koblet til Google Ads (752-112-1519), og «purchase» er importert som primær kjøpskonvertering. Ingen kodeendring trengs (ikke bruk konverteringsetikett i tillegg, det gir dobbelttelling). `finne89@gmail.com` er administrator i Rettfram-Analytics. Første kjøp vises i Ads 1–2 døgn etter at det skjer.
 3. **Sjekk annonsene:** ingen overskrift skal si at fremleiekontrakt koster 99 kr (den koster 129 kr), og negative søkeord (advokat, jobb, kjøpekontrakt bolig m.fl., se `google-ads-sokekampanje.md`) skal være lagt inn.
 4. **Om en uke (ca. 15. okt.):** se på søkeord, klikk og kjøp i Google Ads, Search Console og GA4. Juster bud og budsjett.
 5. **Koble Vercel til GitHub** (Vercel → legal-docs → Settings → Git). Rune må godkjenne. Frem til da publiseres alt manuelt fra PC-en og krever at Rune skriver «deploy».
