@@ -4,7 +4,9 @@
 // after acceptance. Document answers are never sent to any of them: the wizard
 // and download pages are masked for Clarity.
 
-export const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID ?? ""; // AW-…
+// Ads ID and conversion label are public (they ship in the page), so they live
+// in code as defaults; the env vars still override them.
+export const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "AW-18502109574";
 export const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID ?? ""; // G-…
 export const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID ?? "";
 const CONVERSION_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL ?? "";
