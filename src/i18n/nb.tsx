@@ -27,7 +27,7 @@ export const nb: Dict = {
     documents: "Dokumenter",
     pricing: "Priser",
     faq: "Spørsmål",
-    create: "Lag et dokument",
+    create: "Velg dokument",
   },
 
   footer: {
@@ -60,17 +60,17 @@ export const nb: Dict = {
   },
 
   home: {
-    badge: "Ingen abonnement. Ingen konto. Ingen overraskelser.",
+    badge: "Ingen abonnement. Ingen konto.",
     h1: (
       <>
-        Juridiske dokumenter til én <em className="text-brand">ærlig</em> pris.
+        Avtaler, <em className="text-brand">rett fram.</em>
       </>
     ),
     lead: (min: string) =>
-      `Svar på noen enkle spørsmål, og se husleiekontrakten, kjøpekontrakten eller avtalen skrive seg selv. Les hvert ord gratis. Betal én gang, fra ${min}, først når du vil laste ned.`,
-    cta: "Lag et dokument",
+      `Kjøpekontrakt, husleiekontrakt, gjeldsbrev og mer. Svar på noen enkle spørsmål, se avtalen før du betaler, og last ned ferdig PDF fra ${min}.`,
+    cta: "Velg dokument",
     how: "Slik fungerer det",
-    bullets: ["Gratis forhåndsvisning av hele dokumentet", "Betal én gang, behold for alltid", "Ferdig på ca. 5 minutter"],
+    bullets: ["Gratis forhåndsvisning", "Betal én gang", `${SITE.refundDays} dagers angrerett`],
     heroStep: "Steg 2 av 8",
     heroQuestion: "Hvem skal leie boligen?",
     heroAnswer: "Ola Nordmann",
@@ -359,7 +359,7 @@ export const nb: Dict = {
   },
 
   cookies: {
-    text: "Vi vil gjerne bruke informasjonskapsler fra Google og Microsoft til besøksstatistikk og til å måle hvilke annonser som virker. Svarene i dokumentet ditt deles aldri.",
+    text: "Vi bruker informasjonskapsler til statistikk og annonsemåling. Svarene dine deles aldri.",
     accept: "Godta",
     reject: "Avvis",
     more: "Personvern",

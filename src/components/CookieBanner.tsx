@@ -27,18 +27,19 @@ export function CookieBanner() {
   };
 
   return (
-    <div role="dialog" aria-live="polite" aria-label={t.cookies.more} className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-xl rounded-2xl border border-line bg-white p-3 shadow-[0_20px_50px_-20px_rgba(20,23,31,0.45)] sm:p-5">
-      <p className="text-[13px] leading-snug text-ink-soft sm:text-sm sm:leading-relaxed">
+    // Top on phones so it never covers the wizard's bottom buttons; compact everywhere.
+    <div role="dialog" aria-live="polite" aria-label={t.cookies.more} className="fixed inset-x-3 top-3 z-50 mx-auto flex max-w-xl flex-col gap-2.5 rounded-2xl border border-line bg-white p-3 shadow-[0_20px_50px_-20px_rgba(20,23,31,0.45)] sm:top-auto sm:bottom-3 sm:flex-row sm:items-center sm:gap-4 sm:p-4">
+      <p className="text-[13px] leading-snug text-ink-soft sm:flex-1">
         {t.cookies.text}{" "}
         <Link href="/privacy" className="font-medium text-brand underline">
           {t.cookies.more}
         </Link>
       </p>
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4">
-        <button onClick={() => choose("denied")} className="rounded-full border border-line px-4 py-2 text-sm sm:py-2.5 font-semibold text-ink hover:bg-paper">
+      <div className="grid shrink-0 grid-cols-2 gap-2">
+        <button onClick={() => choose("denied")} className="rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink hover:bg-paper">
           {t.cookies.reject}
         </button>
-        <button onClick={() => choose("granted")} className="rounded-full border border-ink bg-ink px-4 py-2 text-sm sm:py-2.5 font-semibold text-white hover:bg-black">
+        <button onClick={() => choose("granted")} className="rounded-full border border-ink bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-black">
           {t.cookies.accept}
         </button>
       </div>
