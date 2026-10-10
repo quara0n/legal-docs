@@ -4,7 +4,7 @@ import { t as tr } from "@/i18n";
 import { LANG } from "@/lib/market";
 import { Icon } from "./Icon";
 
-export function TemplateCard({ t }: { t: Template }) {
+export function TemplateCard({ t, showCategory = true }: { t: Template; showCategory?: boolean }) {
   return (
     <Link
       href={`/documents/${t.slug}`}
@@ -14,7 +14,7 @@ export function TemplateCard({ t }: { t: Template }) {
         <span className="grid size-11 place-items-center rounded-xl bg-brand-soft text-brand">
           <Icon name={t.icon} className="size-5.5" />
         </span>
-        <span className="rounded-full bg-cream px-2.5 py-1 text-xs font-medium text-ink-soft">{tr.categories[t.category] ?? t.category}</span>
+        {showCategory && <span className="rounded-full bg-cream px-2.5 py-1 text-xs font-medium text-ink-soft">{tr.categories[t.category] ?? t.category}</span>}
       </div>
       <h3 className="mt-5 text-lg font-semibold tracking-tight">{t.name}</h3>
       <p className="mt-1.5 flex-1 text-sm leading-relaxed text-ink-soft">{t.tagline}</p>

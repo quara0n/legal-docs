@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 test("landing page shows every document with its price", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "nb");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("ærlig");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("rett fram");
   for (const name of ["Husleiekontrakt", "Kjøpekontrakt", "Gjeldsbrev (låneavtale)"])
     await expect(page.getByRole("heading", { name, level: 3 }).first()).toBeVisible();
   await expect(page.getByText("199 kr").first()).toBeVisible();
