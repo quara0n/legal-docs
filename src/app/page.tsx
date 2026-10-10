@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTemplate, getTemplates } from "@/content";
 import { DocPreview } from "@/components/DocPreview";
@@ -13,6 +14,10 @@ import { HERO } from "@/lib/samples";
 
 // Most-asked documents first. Matches the search campaign's keywords, not measured clicks.
 const FRONT_ORDER = ["kjopekontrakt", "husleiekontrakt", "gjeldsbrev", "fullmakt", "fremleiekontrakt", "taushetserklaering", "oppdragsavtale"];
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   const templates = [...getTemplates()].sort((a, b) => {
