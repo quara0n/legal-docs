@@ -13,6 +13,9 @@ export const SITE = {
   companyId: process.env.NEXT_PUBLIC_COMPANY_ID ?? "915553346",
   companyAddress: process.env.NEXT_PUBLIC_COMPANY_ADDRESS ?? "Aksdal Senter, Raglamyrvegen 20, 5536 Haugesund",
   legalUpdated: formatDate("2026-10-04", LANG),
+  // Public profiles (Gulesider, LinkedIn, Facebook, Trustpilot ...). Listed as sameAs in the
+  // structured data so search engines tie them to this site. Add each URL once it exists.
+  profiles: [] as string[],
   editDays: 30, // free edits and re-downloads after purchase
   refundDays: 14,
 };
