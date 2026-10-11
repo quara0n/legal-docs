@@ -7,6 +7,11 @@ import { gjeldsbrevMal } from "./nb-NO/gjeldsbrev-mal";
 import { fullmaktMal } from "./nb-NO/fullmakt-mal";
 import { oppdragsavtaleFrilanser } from "./nb-NO/oppdragsavtale-frilanser";
 import { taushetserklaeringMal } from "./nb-NO/taushetserklaering-mal";
+import { oppsigelseLeiekontrakt } from "./nb-NO/oppsigelse-leiekontrakt";
+import { depositumHusleie } from "./nb-NO/depositum-husleie";
+import { leieUtHybel } from "./nb-NO/leie-ut-hybel";
+import { kjopekontraktBat } from "./nb-NO/kjopekontrakt-bat";
+import { kjopekontraktBobilCampingvogn } from "./nb-NO/kjopekontrakt-bobil-campingvogn";
 
 export type { Guide, GuideBlock, GuideSection } from "./types";
 
@@ -19,6 +24,11 @@ export const NB_GUIDES: Guide[] = [
   fullmaktMal,
   oppdragsavtaleFrilanser,
   taushetserklaeringMal,
+  oppsigelseLeiekontrakt,
+  depositumHusleie,
+  leieUtHybel,
+  kjopekontraktBat,
+  kjopekontraktBobilCampingvogn,
 ];
 
 /** Guides published on this deployment. Only the Norwegian site has guides. */
