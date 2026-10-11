@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Icon } from "./Icon";
 import { earliestStart, latestMonth, monthLabel, months, noticeBlocks, regulate, type KpiSeries } from "@/lib/kpi";
 import { parseAmount } from "@/lib/doc";
+import { downloadPdf } from "@/lib/downloadPdf";
 
 const inputCls =
   "w-full rounded-xl border border-line bg-white px-4 py-3.5 text-base text-ink sm:text-[15px] outline-none transition placeholder:text-[#a8a59d] hover:border-[#d6d0c2] focus:border-brand focus:ring-4 focus:ring-brand/12";
@@ -39,20 +40,7 @@ export function KpiCalculator({ series }: { series: KpiSeries }) {
     if (!r) return;
     setBusy(true);
     try {
-      const { renderPdf } = await import("@/lib/pdf");
-      const bytes = await renderPdf(noticeBlocks(r, { landlord, tenant, address, noticeDate, startDate }), {
-        title: "Varsel om regulering av husleie",
-        note: "Laget gratis på rettframavtaler.no",
-        pageLabel: (i, n) => `Side ${i} av ${n}`,
-        initials: "",
-        size: "a4",
-      });
-      const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: "application/pdf" }));
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "varsel-regulering-husleie.pdf";
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      await downloadPdf(noticeBlocks(r, { landlord, tenant, address, noticeDate, startDate }), "Varsel om regulering av husleie", "varsel-regulering-husleie.pdf");
     } finally {
       setBusy(false);
     }

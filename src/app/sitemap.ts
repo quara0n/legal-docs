@@ -11,7 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...getTemplates().map((t) => ({ url: `${SITE.url}/documents/${t.slug}`, changeFrequency: "monthly" as const, priority: 0.9 })),
     ...(getGuides().length > 0 ? [{ url: `${SITE.url}/guide`, changeFrequency: "weekly" as const, priority: 0.7 }] : []),
     ...getGuides().map((g) => ({ url: `${SITE.url}/guide/${g.slug}`, lastModified: g.updated, changeFrequency: "monthly" as const, priority: 0.8 })),
-    ...(MARKET === "no" ? [{ url: `${SITE.url}/verktoy/regulere-husleie`, changeFrequency: "monthly" as const, priority: 0.8 }] : []),
+    ...(MARKET === "no" ? ["regulere-husleie", "overtakelsesprotokoll"].map((p) => ({ url: `${SITE.url}/verktoy/${p}`, changeFrequency: "monthly" as const, priority: 0.8 })) : []),
     ...["terms", "privacy", "refunds", "disclaimer"].map((p) => ({ url: `${SITE.url}/${p}`, changeFrequency: "yearly" as const, priority: 0.2 })),
   ];
 }
