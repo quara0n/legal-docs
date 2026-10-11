@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTemplates } from "@/content";
 import { getGuides } from "@/content/guides";
 import { t } from "@/i18n";
+import { MARKET } from "@/lib/market";
 import { SITE } from "@/lib/site";
 import { Logo } from "./Logo";
 
@@ -31,6 +32,7 @@ export function SiteFooter() {
           <ul className="mt-3 space-y-2 text-sm text-ink-soft">
             <li><Link href="/#pricing" className="hover:text-ink">{t.footer.pricing}</Link></li>
             {getGuides().length > 0 && <li><Link href="/guide" className="hover:text-ink">{t.footer.guides}</Link></li>}
+            {MARKET === "no" && <li><Link href="/verktoy/regulere-husleie" className="hover:text-ink">Regulere husleie (gratis)</Link></li>}
             <li><Link href="/terms" className="hover:text-ink">{t.footer.terms}</Link></li>
             <li><Link href="/privacy" className="hover:text-ink">{t.footer.privacy}</Link></li>
             <li><Link href="/refunds" className="hover:text-ink">{t.footer.refunds}</Link></li>
