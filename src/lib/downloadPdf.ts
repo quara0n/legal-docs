@@ -1,3 +1,4 @@
+import { track } from "./analytics";
 import type { Block } from "./doc";
 
 /** Renders blocks to an A4 PDF in the browser and saves it. Used by the free tools. */
@@ -16,4 +17,5 @@ export async function downloadPdf(blocks: Block[], title: string, filename: stri
   a.download = filename;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  track("Free tool PDF", { tool: filename.replace(/\.pdf$/, "") });
 }
