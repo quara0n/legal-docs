@@ -11,6 +11,7 @@ import { oppsigelseLeiekontrakt } from "./nb-NO/oppsigelse-leiekontrakt";
 import { depositumHusleie } from "./nb-NO/depositum-husleie";
 import { leieUtHybel } from "./nb-NO/leie-ut-hybel";
 import { kjopekontraktBat } from "./nb-NO/kjopekontrakt-bat";
+import { kjopekontraktBobilCampingvogn } from "./nb-NO/kjopekontrakt-bobil-campingvogn";
 
 export type { Guide, GuideBlock, GuideSection } from "./types";
 
@@ -27,6 +28,7 @@ export const NB_GUIDES: Guide[] = [
   depositumHusleie,
   leieUtHybel,
   kjopekontraktBat,
+  kjopekontraktBobilCampingvogn,
 ];
 
 /** Guides published on this deployment. Only the Norwegian site has guides. */
