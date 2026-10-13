@@ -32,7 +32,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@graph": [
-                { "@type": "Organization", name: SITE.name, url: SITE.url, email: SITE.supportEmail, logo: `${SITE.url}/apple-icon.png` },
+                {
+                  "@type": "Organization",
+                  name: SITE.name,
+                  url: SITE.url,
+                  email: SITE.supportEmail,
+                  logo: `${SITE.url}/apple-icon.png`,
+                  ...(SITE.companyId && { taxID: SITE.companyId }),
+                  ...(SITE.profiles.length > 0 && { sameAs: SITE.profiles }),
+                },
                 { "@type": "WebSite", name: SITE.name, url: SITE.url },
               ],
             }),

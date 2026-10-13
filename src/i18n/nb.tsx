@@ -5,7 +5,8 @@ import type { Dict } from "./en";
 // All interface text for the Norwegian site.
 export const nb: Dict = {
   meta: {
-    title: `${SITE.name}: Avtaler, rett fram. Juridiske dokumenter til én ærlig pris`,
+    // What people search for first; the slogan is already the page's heading.
+    title: `Maler for husleiekontrakt, kjøpekontrakt og gjeldsbrev | ${SITE.name}`,
     description:
       "Lag husleiekontrakt, kjøpekontrakt, gjeldsbrev, fullmakt og andre avtaler på få minutter. Se hele dokumentet gratis, betal én gang per dokument. Ingen abonnement.",
     ogAlt: "Juridiske dokumenter til én ærlig pris",
