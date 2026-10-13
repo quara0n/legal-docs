@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { demoMode, verifyPurchase } from "@/lib/payments";
+import { VIPPS_API_VERSION, demoMode, verifyPurchase } from "@/lib/payments";
+
+describe("Vipps API version", () => {
+  it("uses the preview release with the Vipps flag", () => {
+    expect(VIPPS_API_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}\.preview; vipps_preview=v1$/);
+  });
+});
 
 describe("purchase verification (demo mode)", () => {
   it("runs in demo mode without a Stripe key", () => {

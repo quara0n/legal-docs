@@ -21,7 +21,7 @@ Rettfram er en norsk dokumentbygger («Avtaler, rett fram.»). 7 maler til 99–
 3. **Sjekk annonsene:** ingen overskrift skal si at fremleiekontrakt koster 99 kr (den koster 129 kr), og negative søkeord (advokat, jobb, kjøpekontrakt bolig m.fl., se `google-ads-sokekampanje.md`) skal være lagt inn.
 4. **Om en uke (ca. 15. okt.):** se på søkeord, klikk og kjøp i Google Ads, Search Console og GA4. Juster bud og budsjett.
 5. **Gmail «send som» `kundeservice@`** (smtp.gmail.com og app-passord, Rune gjør selv) og legg `include:_spf.google.com` til i SPF-posten hos Domeneshop.
-6. **Vipps:** be om tilgang i Stripe (privat forhåndsvisning). Når det er godkjent, sett `NEXT_PUBLIC_VIPPS=1`.
+6. **Vipps:** tilgang ble bedt om 10. okt. via skjemaet på docs.stripe.com/payments/vipps (privat forhåndsvisning), venter på Stripe. Koden er klar. Når Stripe godkjenner: slå på Vipps under Stripe → Settings → Payment methods, og sett `NEXT_PUBLIC_VIPPS=1` i Vercel.
 7. **ElevenLabs:** gratisplanen tillater ikke kommersiell bruk. Oppgrader til Starter før videoen brukes i betalte annonser.
 8. **Stripe:** legg til NOK-utbetalingskonto (saldoen står i EUR).
 

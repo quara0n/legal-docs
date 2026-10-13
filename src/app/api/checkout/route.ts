@@ -2,7 +2,7 @@ import { getLocale, getTemplate } from "@/content";
 import { t } from "@/i18n";
 import { LANG } from "@/lib/market";
 import Stripe from "stripe";
-import { demoMode, stripe, vippsEnabled } from "@/lib/payments";
+import { VIPPS_API_VERSION, demoMode, stripe, vippsEnabled } from "@/lib/payments";
 
 export async function POST(request: Request) {
   const { slug } = (await request.json().catch(() => ({}))) as { slug?: string };
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
           submit: { message: t.api.checkoutNote },
         },
       },
-      vipps ? { apiVersion: `${Stripe.API_VERSION}; vipps_preview=v1` } : undefined,
+      vipps ? { apiVersion: VIPPS_API_VERSION } : undefined,
     );
   } catch (err) {
     // Details go to the server log. The buyer gets a plain message plus Stripe's

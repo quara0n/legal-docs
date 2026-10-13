@@ -15,6 +15,9 @@ export const demoMode = !stripe && process.env.VERCEL_ENV !== "production";
 // Vipps runs through Stripe (Norway, NOK). It is in Stripe private preview, so it
 // stays off until Stripe has approved the account and NEXT_PUBLIC_VIPPS=1 is set.
 export const vippsEnabled = process.env.NEXT_PUBLIC_VIPPS === "1";
+// Preview features need the ".preview" release of the SDK's API version, plus the
+// Vipps flag (docs.stripe.com/payments/vipps/accept-a-payment).
+export const VIPPS_API_VERSION = `${Stripe.API_VERSION.replace(/\.[a-z]+$/, ".preview")}; vipps_preview=v1`;
 
 export type Verification = { ok: true; slug: string; createdAt: number } | { ok: false; reason: string };
 

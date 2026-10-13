@@ -37,7 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   name: SITE.name,
                   url: SITE.url,
                   email: SITE.supportEmail,
-                  logo: `${SITE.url}/icon.svg`,
+                  logo: `${SITE.url}/apple-icon.png`,
                   ...(SITE.companyId && { taxID: SITE.companyId }),
                   ...(SITE.profiles.length > 0 && { sameAs: SITE.profiles }),
                 },
