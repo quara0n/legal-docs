@@ -10,8 +10,10 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { TemplateCard } from "@/components/TemplateCard";
 import { formatPrice, withDefaults } from "@/lib/doc";
 import { t as tr } from "@/i18n";
-import { CURRENCY, LANG } from "@/lib/market";
+import { CURRENCY, LANG, MARKET } from "@/lib/market";
 import { SITE } from "@/lib/site";
+
+const COUNTRY = MARKET === "no" ? "NO" : "US";
 
 export function generateStaticParams() {
   return getTemplates().map((t) => ({ slug: t.slug }));
@@ -44,7 +46,34 @@ export default async function TemplatePage(props: PageProps<"/documents/[slug]">
         name: t.name,
         description: t.seo.description,
         brand: { "@type": "Brand", name: SITE.name },
-        offers: { "@type": "Offer", price: (t.price / 100).toFixed(2), priceCurrency: CURRENCY.toUpperCase(), availability: "https://schema.org/InStock", url: `${SITE.url}/documents/${t.slug}` },
+        image: `${SITE.url}/documents/${t.slug}/opengraph-image`,
+        offers: {
+          "@type": "Offer",
+          price: (t.price / 100).toFixed(2),
+          priceCurrency: CURRENCY.toUpperCase(),
+          availability: "https://schema.org/InStock",
+          url: `${SITE.url}/documents/${t.slug}`,
+          // A PDF download: nothing ships, and the refund window matches the terms.
+          shippingDetails: {
+            "@type": "OfferShippingDetails",
+            shippingRate: { "@type": "MonetaryAmount", value: 0, currency: CURRENCY.toUpperCase() },
+            shippingDestination: { "@type": "DefinedRegion", addressCountry: COUNTRY },
+            deliveryTime: {
+              "@type": "ShippingDeliveryTime",
+              handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 0, unitCode: "DAY" },
+              transitTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 0, unitCode: "DAY" },
+            },
+          },
+          hasMerchantReturnPolicy: {
+            "@type": "MerchantReturnPolicy",
+            applicableCountry: COUNTRY,
+            returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+            merchantReturnDays: SITE.refundDays,
+            returnFees: "https://schema.org/FreeReturn",
+            refundType: "https://schema.org/FullRefund",
+            merchantReturnLink: `${SITE.url}/refunds`,
+          },
+        },
       },
       {
         "@type": "HowTo",
